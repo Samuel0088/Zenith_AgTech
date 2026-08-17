@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
-import { onAuthStateChanged } from "firebase/auth"
-import { auth } from "../../../services/firebase"
+import { getCurrentUser, onAuthStateChanged } from "../../../services/supabase"
 import { ACCOUNT_ROLES, getUserAccessProfile, isOperationalRole } from "../../../services/accessControl"
 import "../../../styles/Global/MenuBar.css"
 
@@ -69,14 +68,15 @@ export default function MenuBar() {
   }, [])
 
   useEffect(() => {
-    const loadRole = async (currentUser = auth.currentUser) => {
-      if (!currentUser) return
-      const profile = await getUserAccessProfile(currentUser.uid)
+    const loadRole = async (currentUser) => {
+      const user = currentUser || await getCurrentUser()
+      if (!user) return
+      const profile = await getUserAccessProfile(user.id)
       setRole(profile?.role || ACCOUNT_ROLES.ADMIN)
     }
 
     const handleRoleUpdated = () => loadRole()
-    const unsubscribe = onAuthStateChanged(auth, loadRole)
+    const unsubscribe = onAuthStateChanged(loadRole)
     window.addEventListener("zenith-user-role-updated", handleRoleUpdated)
 
     return () => {

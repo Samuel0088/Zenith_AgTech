@@ -1,10 +1,8 @@
 import { useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { onAuthStateChanged } from "firebase/auth"
-import { addDoc, collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore"
-import { auth, db } from "../../services/firebase"
 import MenuBar from "../../components/App/Global/MenuBar"
 import { ACCOUNT_ROLES } from "../../services/accessControl"
+import { getUserFarm, onAuthStateChanged, supabase } from "../../services/supabase"
 import "../../styles/App/TeamAccess.css"
 
 const fallbackTasks = [
@@ -24,52 +22,54 @@ export default function EmployeeWork() {
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    const unsubscribe = onAuthStateChanged(async (currentUser) => {
       if (!currentUser) {
         navigate("/login", { replace: true })
         return
       }
 
       setUser(currentUser)
-      const userSnap = await getDoc(doc(db, "users", currentUser.uid))
       let userProfile = null
 
-      if (userSnap.exists()) {
-        const data = userSnap.data()
-        userProfile = { id: userSnap.id, ...data }
+      try {
+        const { data, error } = await supabase
+          .from("users")
+          .select("*")
+          .eq("id", currentUser.id)
+          .maybeSingle()
+
+        if (error) throw error
+
+        if (data) {
+          userProfile = { id: data.id, ...data }
+        }
+      } catch (error) {
+        console.error("Erro ao carregar perfil operacional:", error)
+      }
+
+      if (userProfile) {
         setProfile(userProfile)
-        setWorkStatus(data.status === "offline" ? "trabalhando" : data.status || "trabalhando")
+        setWorkStatus(userProfile.status === "offline" ? "trabalhando" : userProfile.status || "trabalhando")
       }
 
-      const farmsRef = collection(db, "farms")
-      let farmSnap = null
-
-      if (userProfile?.farmId) {
-        const farmDoc = await getDoc(doc(db, "farms", userProfile.farmId))
-        if (farmDoc.exists()) {
-          setFarmData({ id: farmDoc.id, ...farmDoc.data() })
-        }
-      } else {
-        const ownerId = userProfile?.ownerId || userProfile?.teamId
-
-        if (ownerId) {
-          farmSnap = await getDocs(query(farmsRef, where("ownerId", "==", ownerId)))
-        }
-
-        if (!farmSnap || farmSnap.empty) {
-          farmSnap = await getDocs(farmsRef)
-        }
-
-        if (!farmSnap.empty) {
-          const farmDoc = farmSnap.docs[0]
-          setFarmData({ id: farmDoc.id, ...farmDoc.data() })
-        }
+      try {
+        const ownerId = userProfile?.ownerId || userProfile?.teamId || currentUser.id
+        const farm = await getUserFarm(ownerId)
+        if (farm) setFarmData(farm)
+      } catch (error) {
+        console.error("Erro ao carregar fazenda operacional:", error)
       }
 
-      const taskQuery = query(collection(db, "tasks"), where("employeeId", "==", currentUser.uid))
-      const taskSnap = await getDocs(taskQuery)
-      if (!taskSnap.empty) {
-        setTasks(taskSnap.docs.map((taskDoc) => ({ id: taskDoc.id, ...taskDoc.data() })))
+      try {
+        const { data, error } = await supabase
+          .from("tasks")
+          .select("*")
+          .eq("employeeId", currentUser.id)
+
+        if (error) throw error
+        if (data?.length) setTasks(data)
+      } catch (error) {
+        console.error("Erro ao carregar tarefas:", error)
       }
     })
 
@@ -95,10 +95,15 @@ export default function EmployeeWork() {
 
     try {
       if (!String(taskId).startsWith("t")) {
-        await updateDoc(doc(db, "tasks", taskId), {
-          status,
-          updatedAt: new Date().toISOString(),
-        })
+        const { error } = await supabase
+          .from("tasks")
+          .update({
+            status,
+            updatedAt: new Date().toISOString(),
+          })
+          .eq("id", taskId)
+
+        if (error) throw error
       }
     } catch (error) {
       console.error("Erro ao atualizar tarefa:", error)
@@ -111,10 +116,15 @@ export default function EmployeeWork() {
     if (!user) return
 
     try {
-      await updateDoc(doc(db, "users", user.uid), {
-        status,
-        lastActivityAt: new Date().toISOString(),
-      })
+      const { error } = await supabase
+        .from("users")
+        .update({
+          status,
+          lastActivityAt: new Date().toISOString(),
+        })
+        .eq("id", user.id)
+
+      if (error) throw error
     } catch (error) {
       console.error("Erro ao atualizar status:", error)
     }
@@ -126,13 +136,15 @@ export default function EmployeeWork() {
     setSaving(true)
 
     try {
-      await addDoc(collection(db, "activities"), {
-        employeeId: user.uid,
+      const { error } = await supabase.from("activities").insert({
+        employeeId: user.id,
         employeeName: profile?.name || user.email,
         type: "observacao",
         note: note.trim(),
         createdAt: new Date().toISOString(),
       })
+
+      if (error) throw error
       setNote("")
     } catch (error) {
       console.error("Erro ao salvar observacao:", error)

@@ -1,11 +1,11 @@
 // CadastroCompleto.jsx
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { auth, db } from "../../services/firebase"
-import { createUserWithEmailAndPassword } from "firebase/auth"
-import { doc, setDoc, addDoc, collection } from "firebase/firestore"
-import { ACCOUNT_ROLES, getRoleHomePath, isOperationalRole } from "../../services/accessControl"
+import {
+  createFarm,
+  signUpAndCreateProfile,
+} from "../../services/supabase"
 import "../../styles/App/CadastroCompleto.css"
 
 const PROBLEMAS_LAVOURA = [
@@ -33,6 +33,8 @@ export default function CadastroCompleto({ setAppLoading }) {
 
   const [etapa, setEtapa] = useState(1)
   const [loading, setLoading] = useState(false)
+  const creatingUserRef = useRef(false)
+  const savingFarmRef = useRef(false)
   const [cepData, setCepData] = useState(null)
   const [alertMessage, setAlertMessage] = useState({
     type: "",
@@ -48,7 +50,6 @@ export default function CadastroCompleto({ setAppLoading }) {
     document: "",
     email: "",
     password: "",
-    role: ACCOUNT_ROLES.ADMIN,
   })
 
   const [farmData, setFarmData] = useState({
@@ -128,7 +129,7 @@ export default function CadastroCompleto({ setAppLoading }) {
     setUserData({
       ...userData,
       [name]: formattedValue,
-        ...(name === "type" ? { document: "" } : {}),
+      ...(name === "type" ? { document: "" } : {}),
     })
 
     setAlertMessage({
@@ -406,6 +407,8 @@ export default function CadastroCompleto({ setAppLoading }) {
   }
 
   const handleNextUserStep = () => {
+    if (loading || creatingUserRef.current) return
+
     if (userId) {
       setEtapa(2)
       setAlertMessage({
@@ -419,32 +422,25 @@ export default function CadastroCompleto({ setAppLoading }) {
   }
 
   const handleCreateUser = async () => {
+    if (loading || creatingUserRef.current || userId) return
     if (!validateUserData()) return
 
+    creatingUserRef.current = true
     setLoading(true)
 
     try {
-      const userCred = await createUserWithEmailAndPassword(
-        auth,
-        userData.email,
-        userData.password
-      )
-
-      await setDoc(doc(db, "users", userCred.user.uid), {
-        name: userData.name,
-        age: parseInt(userData.age),
-        type: userData.type,
-        document: userData.document,
+      const { user } = await signUpAndCreateProfile({
         email: userData.email,
-        hectares: 0,
-        role: userData.role,
-        position: isOperationalRole(userData.role) ? "Operacional de campo" : "Administrador",
-        status: "offline",
-        teamId: userCred.user.uid,
-        createdAt: new Date().toISOString(),
+        password: userData.password,
+        profile: {
+          name: userData.name,
+          age: parseInt(userData.age),
+          type: userData.type,
+          document: userData.document,
+        },
       })
 
-      setUserId(userCred.user.uid)
+      setUserId(user.id)
 
       setAlertMessage({
         type: "success",
@@ -452,14 +448,6 @@ export default function CadastroCompleto({ setAppLoading }) {
       })
 
       setTimeout(() => {
-        if (isOperationalRole(userData.role)) {
-          sessionStorage.removeItem("zenithShowWhiteLoaderOnce")
-          sessionStorage.setItem("zenithBlockWhiteLoaderUntil", String(Date.now() + 5000))
-          setAppLoading?.(true)
-          navigate(getRoleHomePath(userData.role), { replace: true })
-          return
-        }
-
         setEtapa(2)
 
         setAlertMessage({
@@ -468,6 +456,7 @@ export default function CadastroCompleto({ setAppLoading }) {
         })
       }, 1200)
     } catch (error) {
+      console.error("Erro ao criar usuario/agricultor no Supabase:", error)
       let errorMessage = "Erro ao criar conta."
 
       if (error.code === "auth/email-already-in-use") {
@@ -487,31 +476,32 @@ export default function CadastroCompleto({ setAppLoading }) {
         text: errorMessage,
       })
     } finally {
+      creatingUserRef.current = false
       setLoading(false)
     }
   }
 
   const handleSaveFarm = async () => {
+    if (loading || savingFarmRef.current) return
+    if (!userId) {
+      setAlertMessage({
+        type: "error",
+        text: "Crie os dados do agricultor antes de cadastrar a fazenda.",
+      })
+      return
+    }
+
     if (!(await validateFarmData())) return
 
+    savingFarmRef.current = true
     setLoading(true)
 
     try {
-      await addDoc(collection(db, "farms"), {
+      await createFarm({
         ...farmData,
-        plantacao: farmData.plantacao.join(", "),
         ownerId: userId,
         ownerName: userData.name,
-        createdAt: new Date(),
       })
-
-      await setDoc(
-        doc(db, "users", userId),
-        {
-          hectares: parseFloat(farmData.area_total),
-        },
-        { merge: true }
-      )
 
       setAlertMessage({
         type: "success",
@@ -532,6 +522,7 @@ export default function CadastroCompleto({ setAppLoading }) {
         text: "Erro ao cadastrar fazenda.",
       })
     } finally {
+      savingFarmRef.current = false
       setLoading(false)
     }
   }
@@ -811,20 +802,6 @@ export default function CadastroCompleto({ setAppLoading }) {
               />
             </div>
 
-            <div className="input-group">
-              <label>Tipo de conta</label>
-
-              <select
-                name="role"
-                value={userData.role}
-                onChange={handleUserChange}
-              >
-                <option value={ACCOUNT_ROLES.ADMIN}>Administrador / Chefe</option>
-                <option value={ACCOUNT_ROLES.EMPLOYEE}>Funcionário</option>
-                <option value={ACCOUNT_ROLES.COLLABORATOR}>Colaborador</option>
-              </select>
-            </div>
-
             <div className="input-row">
 
               <div className="input-group">
@@ -927,21 +904,21 @@ export default function CadastroCompleto({ setAppLoading }) {
             )}
 
             <button
+              type="button"
               className="btn-next"
               onClick={handleNextUserStep}
               disabled={loading}
             >
               {loading
                 ? "Criando conta..."
-                : isOperationalRole(userData.role)
-                  ? "Criar conta operacional"
-                  : "Próximo →"}
+                : "Próximo →"}
             </button>
 
             <button
               type="button"
               className="cadastro-login-back"
               onClick={() => navigate("/login")}
+              disabled={loading}
             >
               <span className="material-symbols-outlined">arrow_back</span>
               Voltar para login
@@ -1096,13 +1073,16 @@ export default function CadastroCompleto({ setAppLoading }) {
             <div className="botoes-container">
 
               <button
+                type="button"
                 className="btn-voltar"
                 onClick={() => setEtapa(1)}
+                disabled={loading}
               >
                 ← Voltar
               </button>
 
               <button
+                type="button"
                 className="btn-finalizar"
                 onClick={handleSaveFarm}
                 disabled={loading}

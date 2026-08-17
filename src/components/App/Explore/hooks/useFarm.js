@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react"
-import { auth, db } from "../../../../services/firebase"
-import { collection, query, where, onSnapshot } from "firebase/firestore"
+import { getUserFarm, onAuthStateChanged } from "../../../../services/supabase"
 
 export function useFarm() {
   const [farmData, setFarmData] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    let unsubscribeFarm = null
-
-    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+    const unsubscribe = onAuthStateChanged(async (user) => {
       if (!user) {
         setFarmData(null)
         setLoading(false)
@@ -18,37 +15,17 @@ export function useFarm() {
 
       setLoading(true)
 
-      const q = query(
-        collection(db, "farms"),
-        where("ownerId", "==", user.uid)
-      )
-
-      unsubscribeFarm = onSnapshot(
-        q,
-        (snapshot) => {
-          if (!snapshot.empty) {
-            const farmDoc = snapshot.docs[0]
-            setFarmData({
-              id: farmDoc.id,
-              ...farmDoc.data()
-            })
-          } else {
-            setFarmData(null)
-          }
-
-          setLoading(false)
-        },
-        (error) => {
-          console.error("Erro ao buscar fazenda:", error)
-          setLoading(false)
-        }
-      )
+      try {
+        const farm = await getUserFarm(user.id)
+        setFarmData(farm)
+      } catch (error) {
+        console.error("Erro ao buscar fazenda:", error)
+      } finally {
+        setLoading(false)
+      }
     })
 
-    return () => {
-      if (unsubscribeFarm) unsubscribeFarm()
-      unsubscribeAuth()
-    }
+    return () => unsubscribe()
   }, [])
 
   return { farmData, loading }

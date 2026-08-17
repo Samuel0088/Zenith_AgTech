@@ -1,10 +1,8 @@
 // Home.jsx
 import { useEffect, useLayoutEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { onAuthStateChanged } from "firebase/auth"
-import { auth, db } from "../../services/firebase"
+import { getProfile, getUserFarm, onAuthStateChanged } from "../../services/supabase"
 import { getWeatherByCity } from "../../services/weatherService"
-import { doc, getDoc, query, where, getDocs, collection } from "firebase/firestore"
 import {
   Cloud,
   CloudFog,
@@ -161,28 +159,21 @@ export default function Home() {
   }
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(async (user) => {
       if (!user) {
         return
       }
 
       try {
-        const docRef = doc(db, "users", user.uid)
-        const docSnap = await getDoc(docRef)
+        const profile = await getProfile(user.id)
 
-        if (docSnap.exists()) {
-          setUserData(docSnap.data())
+        if (profile) {
+          setUserData(profile)
         }
 
-        const q = query(
-          collection(db, "farms"),
-          where("ownerId", "==", user.uid)
-        )
+        const farm = await getUserFarm(user.id)
 
-        const snapshot = await getDocs(q)
-
-        if (!snapshot.empty) {
-          const farm = snapshot.docs[0].data()
+        if (farm) {
           setFarmData(farm)
 
           if (farm.municipio && farm.uf) {

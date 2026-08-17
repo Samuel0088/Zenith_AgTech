@@ -2,10 +2,9 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom"
 import { useState, useEffect, useRef } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { onAuthStateChanged } from "firebase/auth"
 import { Navigate } from "react-router-dom"
-import { auth } from "./services/firebase"
 import { ACCOUNT_ROLES, getRoleHomePath, getUserAccessProfile } from "./services/accessControl"
+import { onAuthStateChanged } from "./services/supabase"
 
 import Intro from "./pages/App/Intro"
 import Login from "./pages/App/Login"
@@ -102,13 +101,13 @@ function ProtectedRoute({ allowedRoles, children }) {
   })
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    const unsubscribe = onAuthStateChanged(async (currentUser) => {
       if (!currentUser) {
         setState({ loading: false, user: null, profile: null })
         return
       }
 
-      const profile = await getUserAccessProfile(currentUser.uid)
+      const profile = await getUserAccessProfile(currentUser.id)
       setState({ loading: false, user: currentUser, profile })
     })
 

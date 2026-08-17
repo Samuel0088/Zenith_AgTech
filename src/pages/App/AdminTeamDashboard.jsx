@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useLocation } from "react-router-dom"
-import { addDoc, collection, getDocs } from "firebase/firestore"
-import { auth, db } from "../../services/firebase"
 import MenuBar from "../../components/App/Global/MenuBar"
 import { ACCOUNT_ROLES } from "../../services/accessControl"
+import { getCurrentUser, supabase } from "../../services/supabase"
 import "../../styles/App/TeamAccess.css"
 
 const demoEmployees = [
@@ -94,34 +93,35 @@ export default function AdminTeamDashboard() {
   useEffect(() => {
     async function loadEmployees() {
       try {
-        const usersSnap = await getDocs(collection(db, "users"))
-        const employeeDocs = usersSnap.docs.filter((docSnap) => (
-          docSnap.data().role === ACCOUNT_ROLES.EMPLOYEE ||
-          docSnap.data().role === ACCOUNT_ROLES.COLLABORATOR
-        ))
+        const { data, error } = await supabase
+          .from("users")
+          .select("*")
+          .in("role", [ACCOUNT_ROLES.EMPLOYEE, ACCOUNT_ROLES.COLLABORATOR])
 
-        if (employeeDocs.length > 0) {
-          setEmployees(employeeDocs.map((docSnap, index) => ({
-            id: docSnap.id,
-            name: docSnap.data().name || "Funcionário",
-            position: docSnap.data().position || "Funcionário de campo",
-            sector: docSnap.data().sector || "Campo",
-            status: docSnap.data().status || "offline",
-            entry: docSnap.data().entry || "07:30",
-            exit: docSnap.data().exit || "17:30",
-            hours: docSnap.data().hours || 0,
-            pending: docSnap.data().pendingTasks || 0,
-            active: docSnap.data().activeTasks || 0,
-            done: docSnap.data().completedTasks || 0,
-            daily: docSnap.data().dailyProductivity || 0,
-            weekly: docSnap.data().weeklyProductivity || 0,
-            monthly: docSnap.data().monthlyProductivity || 0,
-            delays: docSnap.data().delays || 0,
-            absences: docSnap.data().absences || 0,
-            lastActivity: docSnap.data().lastActivity || "Sem atividade registrada",
+        if (error) throw error
+
+        if (data?.length > 0) {
+          setEmployees(data.map((employee, index) => ({
+            id: employee.id,
+            name: employee.name || "Funcionário",
+            position: employee.position || "Funcionário de campo",
+            sector: employee.sector || "Campo",
+            status: employee.status || "offline",
+            entry: employee.entry || "07:30",
+            exit: employee.exit || "17:30",
+            hours: employee.hours || 0,
+            pending: employee.pendingTasks || 0,
+            active: employee.activeTasks || 0,
+            done: employee.completedTasks || 0,
+            daily: employee.dailyProductivity || 0,
+            weekly: employee.weeklyProductivity || 0,
+            monthly: employee.monthlyProductivity || 0,
+            delays: employee.delays || 0,
+            absences: employee.absences || 0,
+            lastActivity: employee.lastActivity || "Sem atividade registrada",
             colorIndex: index,
           })))
-          setSelectedId(employeeDocs[0].id)
+          setSelectedId(data[0].id)
         }
       } catch (error) {
         console.error("Erro ao carregar equipe:", error)
@@ -160,7 +160,7 @@ export default function AdminTeamDashboard() {
     if (!taskTitle.trim() || !selected) return
 
     try {
-      await addDoc(collection(db, "tasks"), {
+      const { error } = await supabase.from("tasks").insert({
         employeeId: selected.id,
         employeeName: selected.name,
         title: taskTitle.trim(),
@@ -169,6 +169,8 @@ export default function AdminTeamDashboard() {
         due: filters.date || "Sem prazo",
         createdAt: new Date().toISOString(),
       })
+
+      if (error) throw error
       setTaskTitle("")
     } catch (error) {
       console.error("Erro ao atribuir tarefa:", error)
@@ -184,8 +186,8 @@ export default function AdminTeamDashboard() {
       position: newEmployee.position.trim() || (newEmployee.role === ACCOUNT_ROLES.COLLABORATOR ? "Colaborador" : "Funcionário de campo"),
       sector: newEmployee.sector.trim() || "Campo",
       role: newEmployee.role,
-      ownerId: auth.currentUser?.uid || "",
-      teamId: auth.currentUser?.uid || "",
+      ownerId: "",
+      teamId: "",
       status: "offline",
       entry: "--:--",
       exit: "--:--",
@@ -204,13 +206,26 @@ export default function AdminTeamDashboard() {
     }
 
     try {
-      const docRef = await addDoc(collection(db, "users"), employeePayload)
-      const createdEmployee = {
-        id: docRef.id,
+      const currentUser = await getCurrentUser()
+      const payload = {
         ...employeePayload,
-        entry: employeePayload.entry,
-        exit: employeePayload.exit,
-        hours: employeePayload.hours,
+        ownerId: currentUser?.id || "",
+        teamId: currentUser?.id || "",
+      }
+      const { data, error } = await supabase
+        .from("users")
+        .insert(payload)
+        .select("*")
+        .single()
+
+      if (error) throw error
+
+      const createdEmployee = {
+        id: data.id,
+        ...payload,
+        entry: payload.entry,
+        exit: payload.exit,
+        hours: payload.hours,
         pending: 0,
         active: 0,
         done: 0,
@@ -219,11 +234,11 @@ export default function AdminTeamDashboard() {
         monthly: 0,
         delays: 0,
         absences: 0,
-        lastActivity: employeePayload.lastActivity,
+        lastActivity: payload.lastActivity,
       }
 
       setEmployees((current) => [createdEmployee, ...current])
-      setSelectedId(docRef.id)
+      setSelectedId(data.id)
       setNewEmployee({ name: "", email: "", position: "", sector: "", role: ACCOUNT_ROLES.EMPLOYEE })
       setShowNewEmployee(false)
     } catch (error) {

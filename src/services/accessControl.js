@@ -1,5 +1,4 @@
-import { doc, getDoc } from "firebase/firestore"
-import { db } from "./firebase"
+import { getProfile, supabase } from "./supabase"
 
 export const ACCOUNT_ROLES = {
   ADMIN: "admin",
@@ -27,13 +26,34 @@ export function getRoleHomePath(role) {
 export async function getUserAccessProfile(uid) {
   if (!uid) return null
 
-  const userSnap = await getDoc(doc(db, "users", uid))
-  if (!userSnap.exists()) return null
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", uid)
+      .maybeSingle()
 
-  const data = userSnap.data()
-  return {
-    id: userSnap.id,
-    ...data,
-    role: normalizeRole(data.role),
+    if (!error && data) {
+      return {
+        id: data.id,
+        ...data,
+        role: normalizeRole(data.role),
+      }
+    }
+  } catch (error) {
+    console.error("[Supabase] Erro ao consultar perfil de acesso:", error)
+  }
+
+  try {
+    const profile = await getProfile(uid)
+    if (!profile) return null
+
+    return {
+      ...profile,
+      role: normalizeRole(profile.role),
+    }
+  } catch (error) {
+    console.error("[Supabase] Erro ao consultar agricultor para acesso:", error)
+    return null
   }
 }

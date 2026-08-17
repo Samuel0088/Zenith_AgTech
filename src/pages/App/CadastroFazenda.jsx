@@ -1,13 +1,12 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { auth } from "../../services/firebase"
-import { db } from "../../services/firebase"
-import { addDoc, collection, query, where, getDocs } from "firebase/firestore"
+import { createFarm, getCurrentUser, getUserFarm } from "../../services/supabase"
 import "../../styles/App/CadastrarFazenda.css"
 
 export default function CadastrarFazenda({ setAppLoading }) {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
+  const submittingRef = useRef(false)
 
   const [formData, setFormData] = useState({
     name: "",
@@ -29,33 +28,29 @@ export default function CadastrarFazenda({ setAppLoading }) {
 
   async function handleRegister(e) {
     e.preventDefault()
+    if (loading || submittingRef.current) return
 
-    const user = auth.currentUser
+    const user = await getCurrentUser()
     if (!user) {
       alert("Usuário não autenticado")
       return
     }
 
     try {
+      submittingRef.current = true
       setLoading(true)
 
-      const q = query(
-        collection(db, "farms"),
-        where("ownerId", "==", user.uid)
-      )
+      const existingFarm = await getUserFarm(user.id)
 
-      const snapshot = await getDocs(q)
-
-      if (!snapshot.empty) {
+      if (existingFarm) {
         alert("Você já possui uma fazenda cadastrada.")
         navigate("/home")
         return
       }
 
-      await addDoc(collection(db, "farms"), {
+      await createFarm({
         ...formData,
-        ownerId: user.uid,
-        createdAt: new Date()
+        ownerId: user.id,
       })
 
       alert("Fazenda cadastrada com sucesso!")
@@ -68,6 +63,7 @@ export default function CadastrarFazenda({ setAppLoading }) {
       console.error(error)
       alert("Erro ao cadastrar fazenda")
     } finally {
+      submittingRef.current = false
       setLoading(false)
     }
   }

@@ -1,28 +1,11 @@
 import { useState, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
-import { sendPasswordResetEmail } from "firebase/auth"
-import { auth } from "../../services/firebase"
+import { resetPasswordForEmail } from "../../services/supabase"
 
 import "../../styles/App/ForgotPassword.css"
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-const FIREBASE_ERROR_MESSAGES = {
-  "auth/user-not-found":
-    "Nenhuma conta encontrada com este email. 🌱",
-
-  "auth/invalid-email":
-    "Digite um email válido. 📧",
-
-  "auth/too-many-requests":
-    "Muitas tentativas. Aguarde alguns minutos. ⏳",
-
-  "auth/network-request-failed":
-    "Erro de conexão. Verifique sua internet. 🌐",
-}
-
-const DEFAULT_ERROR =
-  "Não foi possível enviar o email de recuperação."
+const DEFAULT_ERROR = "Nao foi possivel enviar o email de recuperacao."
 
 export default function ForgotPassword() {
   const navigate = useNavigate()
@@ -40,18 +23,12 @@ export default function ForgotPassword() {
 
   const validateEmail = () => {
     if (!email.trim()) {
-      showAlert(
-        "error",
-        "Digite o email cadastrado para recuperar sua senha."
-      )
+      showAlert("error", "Digite o email cadastrado para recuperar sua senha.")
       return false
     }
 
     if (!EMAIL_REGEX.test(email.trim())) {
-      showAlert(
-        "error",
-        "Digite um email válido."
-      )
+      showAlert("error", "Digite um email valido.")
       return false
     }
 
@@ -65,22 +42,19 @@ export default function ForgotPassword() {
     setAlert({ type: "", text: "" })
 
     try {
-      await sendPasswordResetEmail(auth, email.trim())
+      await resetPasswordForEmail(email.trim())
 
       showAlert(
         "success",
-        "Email enviado com sucesso! Verifique sua caixa de entrada. 📨"
+        "Email enviado com sucesso! Verifique sua caixa de entrada."
       )
 
       setTimeout(() => {
         navigate("/login")
       }, 2500)
-
     } catch (error) {
-      const message =
-        FIREBASE_ERROR_MESSAGES[error.code] ?? DEFAULT_ERROR
-
-      showAlert("error", message)
+      console.error("Erro ao enviar recuperacao de senha:", error)
+      showAlert("error", DEFAULT_ERROR)
     } finally {
       setLoading(false)
     }
@@ -94,8 +68,6 @@ export default function ForgotPassword() {
 
   return (
     <div className="forgot-page" data-system-bar-color="#091c13">
-
-      {/* HERO */}
       <div className="forgot-hero">
         <div className="forgot-hero__overlay" />
 
@@ -109,7 +81,7 @@ export default function ForgotPassword() {
           </div>
 
           <p className="forgot-hero__subtitle">
-            Recuperação de acesso
+            Recuperacao de acesso
           </p>
 
           <h1 className="forgot-hero__title">
@@ -118,9 +90,7 @@ export default function ForgotPassword() {
         </div>
       </div>
 
-      {/* CARD */}
       <main className="forgot-card" data-system-bar-color="#f7f5f0">
-
         <div className="forgot-header">
           <h2 className="forgot-header__title">
             Recuperar senha
@@ -174,7 +144,7 @@ export default function ForgotPassword() {
               Enviando...
             </>
           ) : (
-            "Enviar recuperação"
+            "Enviar recuperacao"
           )}
         </button>
 
@@ -185,9 +155,7 @@ export default function ForgotPassword() {
         >
           Voltar para login
         </button>
-
       </main>
-
     </div>
   )
 }

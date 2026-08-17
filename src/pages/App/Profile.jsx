@@ -1,7 +1,13 @@
 // Profile.jsx - Versão Tecnológica com Componentes
 import { useState, useEffect } from "react"
-import { auth, db } from "../../services/firebase"
-import { doc, getDoc, updateDoc, collection, query, where, getDocs } from "firebase/firestore"
+import {
+  getProfile,
+  getUserFarm,
+  onAuthStateChanged,
+  signOut,
+  updateFarm,
+  updateProfile,
+} from "../../services/supabase"
 import { useNavigate } from "react-router-dom"
 
 import FarmEditForm from "../../components/App/Profile/FarmEditForm"
@@ -19,7 +25,6 @@ import FarmInfoView from "../../components/App/Profile/FarmInfoView"
 import ProfileEditForm from "../../components/App/Profile/ProfileEditForm"
 import MenuBar from "../../components/App/Global/MenuBar"
 import AppHeader from "../../components/App/Global/AppHeader"
-import { ACCOUNT_ROLES } from "../../services/accessControl"
 
 // CSS
 import "../../styles/App/Profile.css"
@@ -41,7 +46,6 @@ export default function Profile() {
     document: "",
     hectares: "",
     email: "",
-    role: ACCOUNT_ROLES.ADMIN,
     profileIcon: "👨‍🌾",
     phone: "",
     city: "",
@@ -51,11 +55,11 @@ export default function Profile() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
+    const unsubscribe = onAuthStateChanged(async (currentUser) => {
       if (currentUser) {
         setUser(currentUser)
-        await loadUserData(currentUser.uid)
-        await loadFarmData(currentUser.uid)
+        await loadUserData(currentUser.id)
+        await loadFarmData(currentUser.id)
       } else {
         navigate("/login")
       }
@@ -67,9 +71,8 @@ export default function Profile() {
 
   const loadUserData = async (uid) => {
     try {
-      const userDoc = await getDoc(doc(db, "users", uid))
-      if (userDoc.exists()) {
-        const data = userDoc.data()
+      const data = await getProfile(uid)
+      if (data) {
         setUserData(data)
         setFormData({
           name: data.name || "",
@@ -78,7 +81,6 @@ export default function Profile() {
           document: data.document || "",
           hectares: data.hectares || "",
           email: data.email || "",
-          role: data.role || ACCOUNT_ROLES.ADMIN,
           profileIcon: data.profileIcon || "👨‍🌾",
           phone: data.phone || "",
           city: data.city || "",
@@ -93,16 +95,11 @@ export default function Profile() {
 
   const loadFarmData = async (uid) => {
     try {
-      const farmsRef = collection(db, "farms")
-      const q = query(farmsRef, where("ownerId", "==", uid))
-      const querySnapshot = await getDocs(q)
+      const data = await getUserFarm(uid)
 
-      if (!querySnapshot.empty) {
-        const farmDoc = querySnapshot.docs[0]
-        const data = farmDoc.data()
-        
+      if (data) {
         setFarmData({
-          id: farmDoc.id,
+          id: data.id,
           name: data.name || "",
           area_total: data.area_total || "0",
           bairro: data.bairro || "",
@@ -139,16 +136,15 @@ export default function Profile() {
 
   const handleSave = async () => {
     if (!user) return
+    if (saving) return
 
     setSaving(true)
     try {
-      const userRef = doc(db, "users", user.uid)
-      await updateDoc(userRef, {
+      await updateProfile(user.id, {
         name: formData.name,
         age: parseInt(formData.age) || null,
         type: formData.type,
         document: formData.document,
-        role: formData.role || ACCOUNT_ROLES.ADMIN,
         hectares: parseFloat(formData.hectares) || null,
         profileIcon: formData.profileIcon,
         phone: formData.phone,
@@ -159,8 +155,7 @@ export default function Profile() {
 
       showAlert("success", "Perfil atualizado com sucesso! 🌱")
       setEditing(false)
-      await loadUserData(user.uid)
-      window.dispatchEvent(new Event("zenith-user-role-updated"))
+      await loadUserData(user.id)
     } catch (error) {
       console.error("Erro ao atualizar:", error)
       showAlert("error", "Erro ao atualizar perfil")
@@ -171,11 +166,12 @@ export default function Profile() {
 
   const handleSaveFarm = async (updatedFarmData) => {
   if (!user || !farmData?.id) return
+  if (savingFarm) return
 
   setSavingFarm(true)
   try {
-    const farmRef = doc(db, "farms", farmData.id)
-    await updateDoc(farmRef, {
+    await updateFarm(farmData.id, {
+      ownerId: user.id,
       name: updatedFarmData.name,
       area_total: parseFloat(updatedFarmData.area_total) || 0,
       plantacao: updatedFarmData.plantacao || "",
@@ -191,7 +187,7 @@ export default function Profile() {
 
     showAlert("success", "Fazenda atualizada com sucesso! 🌱")
     setEditingFarm(false)
-    await loadFarmData(user.uid)
+    await loadFarmData(user.id)
   } catch (error) {
     console.error("Erro ao atualizar fazenda:", error)
     showAlert("error", "Erro ao atualizar fazenda")
@@ -202,7 +198,7 @@ export default function Profile() {
 
   const handleLogout = async () => {
     try {
-      await auth.signOut()
+      await signOut()
       navigate("/login")
     } catch (error) {
       console.error("Erro ao sair:", error)
@@ -303,7 +299,6 @@ export default function Profile() {
               document: userData?.document || "",
               hectares: userData?.hectares || "",
               email: user?.email || "",
-              role: userData?.role || ACCOUNT_ROLES.ADMIN,
               profileIcon: userData?.profileIcon || "👨‍🌾",
               phone: userData?.phone || "",
               city: userData?.city || "",

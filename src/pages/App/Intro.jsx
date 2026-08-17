@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { onAuthStateChanged } from "firebase/auth"
-import { auth } from "../../services/firebase"
+import { onAuthStateChanged } from "../../services/supabase"
 
 import {
   ShieldCheck,
@@ -23,7 +22,7 @@ export default function Intro() {
   const [checkingAuth, setCheckingAuth] = useState(true)
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged((user) => {
       if (user) {
         navigate("/home", { replace: true })
         return

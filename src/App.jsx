@@ -196,7 +196,7 @@ function AnimatedRoutes({ setAppLoading, onInstallRequest, isInstalled }) {
 }
 
 function App() {
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const [showInstallPrompt, setShowInstallPrompt] = useState(false)
   const [showInstallSuccess, setShowInstallSuccess] = useState(false)

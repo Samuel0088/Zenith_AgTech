@@ -1,4 +1,7 @@
-@media (max-width: 550px), (pointer: coarse) and (max-width: 900px) {
+@media (min-width: 390px) and (max-width: 550px),
+  (max-width: 550px) and (min-height: 760px),
+  (pointer: coarse) and (min-width: 390px) and (max-width: 550px),
+  (pointer: coarse) and (max-width: 550px) and (min-height: 760px) {
   :root {
     --app-mobile-canvas-width: 100%;
     --app-mobile-nav-width: 382px;
@@ -398,8 +401,10 @@
   }
 }
 
-@media (min-width: 350px) and (min-height: 720px) and (max-width: 550px),
-  (pointer: coarse) and (min-width: 350px) and (min-height: 720px) and (max-width: 900px) {
+@media (min-width: 390px) and (max-width: 550px),
+  (max-width: 550px) and (min-height: 760px),
+  (pointer: coarse) and (min-width: 390px) and (max-width: 550px),
+  (pointer: coarse) and (max-width: 550px) and (min-height: 760px) {
   .home-shell {
     --home-large-phone-gutter: 22px;
   }
@@ -412,6 +417,27 @@
 
   body:has(.home-shell) .nav {
     width: min(calc(100vw - 56px), 354px) !important;
+  }
+
+  body:has(.home-shell) .accessibility-widget {
+    left: auto !important;
+    right: 22px !important;
+    inset-inline-start: auto !important;
+    inset-inline-end: 22px !important;
+    transform: none !important;
+  }
+
+  .home-app-header .home-user-heading {
+    max-width: min(310px, calc(100vw - 104px)) !important;
+  }
+
+  .home-app-header .home-user-heading span:first-child {
+    font-size: 2.04rem !important;
+    line-height: 1.04 !important;
+  }
+
+  .home-app-header .home-user-heading small {
+    font-size: 0.92rem !important;
   }
 
   .home-container .app-footer {
@@ -445,10 +471,10 @@
 
   .home-shell .weather-illustration {
     top: -4px !important;
-    right: calc(var(--home-large-phone-gutter) * -1.15) !important;
+    right: 0 !important;
     width: 260px !important;
     height: 194px !important;
-    transform: translateY(-13px) rotate(-2deg) !important;
+    transform: translateY(-13px) translateX(4px) rotate(-2deg) !important;
   }
 
   .home-shell .weather-illustration img {

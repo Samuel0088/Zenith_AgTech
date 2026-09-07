@@ -1,8 +1,7 @@
 @media (min-width: 390px) and (max-width: 550px),
-  (max-width: 550px) and (min-height: 760px),
-  (pointer: coarse) and (min-width: 390px) and (max-width: 550px),
-  (pointer: coarse) and (max-width: 550px) and (min-height: 760px) {
+  (pointer: coarse) and (min-width: 390px) and (max-width: 550px) {
   :root {
+    --app-content-gutter: 22px;
     --app-mobile-canvas-width: 100%;
     --app-mobile-nav-width: 382px;
   }
@@ -21,12 +20,18 @@
   .home-shell .home-container,
   .home-shell .home-app-header .header-top,
   .explore-container .explore-tabs-modern,
+  .explore-container > .tab-content,
+  .diagnostic-container,
+  .climate-dashboard,
   .profile-container-tech,
   .team-page,
   .diario-container,
   .mapa-container,
+  .mapa-dashboard,
   .estoque-container,
+  .estoque-dashboard,
   .atividades-container,
+  .activities-dashboard,
   .drone-law-container,
   .all-history-container,
   .batch-result-page {
@@ -160,7 +165,7 @@
   }
 }
 
-@media (min-width: 390px) and (max-width: 550px), (pointer: coarse) and (min-width: 390px) and (max-width: 900px) {
+@media (min-width: 390px) and (max-width: 550px), (pointer: coarse) and (min-width: 390px) and (max-width: 550px) {
   .home-shell .home-weather-hero {
     min-height: 264px !important;
     padding-top: 0 !important;
@@ -402,9 +407,7 @@
 }
 
 @media (min-width: 390px) and (max-width: 550px),
-  (max-width: 550px) and (min-height: 760px),
-  (pointer: coarse) and (min-width: 390px) and (max-width: 550px),
-  (pointer: coarse) and (max-width: 550px) and (min-height: 760px) {
+  (pointer: coarse) and (min-width: 390px) and (max-width: 550px) {
   .home-shell {
     --home-large-phone-gutter: 22px;
   }
@@ -560,5 +563,211 @@
 
   .footer-section h5 {
     font-size: 0.86rem !important;
+  }
+
+  .explore-container .explore-tabs-modern {
+    padding-inline: var(--app-content-gutter) !important;
+    scroll-padding-inline: var(--app-content-gutter) !important;
+  }
+
+  .explore-container > .tab-content {
+    padding-inline: 0 !important;
+  }
+
+  :is(.diagnostic-container, .climate-dashboard, .diario-container, .mapa-container, .mapa-dashboard, .estoque-container, .estoque-dashboard, .atividades-container, .activities-dashboard, .drone-law-container, .all-history-container, .batch-result-page) {
+    padding-left: var(--app-content-gutter) !important;
+    padding-right: var(--app-content-gutter) !important;
+  }
+
+  :is(.explore-container--monitoramento, .explore-container--clima, .explore-container--diario, .explore-container--mapa, .explore-container--estoque, .explore-container--atividades, .explore-container--legislacao, .explore-container--diagnostico) .explore-tab {
+    min-height: 42px !important;
+    padding: 0 15px !important;
+    gap: 7px !important;
+    font-size: 0.72rem !important;
+  }
+
+  :is(.explore-container--monitoramento, .explore-container--clima, .explore-container--diario, .explore-container--mapa, .explore-container--estoque, .explore-container--atividades, .explore-container--legislacao, .explore-container--diagnostico) .explore-tab-label {
+    font-size: 0.76rem !important;
+  }
+
+  .diagnostico-title,
+  .diagnostic-hero h1,
+  .climate-location h1,
+  .diario-header h2,
+  .mapa-dashboard .mapa-header h1,
+  .estoque-hero h1,
+  .activities-dashboard .activities-page-header h1,
+  .drone-law-dashboard .drone-law-hero h1,
+  .profile-redesign .profile-mobile-name h1,
+  .team-hero h1 {
+    font-size: 2rem !important;
+    line-height: 1.04 !important;
+  }
+
+  .diagnostic-header p,
+  .climate-location p,
+  .diario-header p,
+  .mapa-dashboard .mapa-header p,
+  .estoque-hero p,
+  .activities-dashboard .activities-page-header p,
+  .drone-law-dashboard .drone-law-hero p,
+  .profile-redesign .profile-mobile-name p,
+  .team-hero p {
+    font-size: 0.88rem !important;
+    line-height: 1.35 !important;
+  }
+
+  .climate-temperature strong {
+    font-size: 4.55rem !important;
+  }
+
+  .climate-temperature span {
+    font-size: 1.55rem !important;
+  }
+
+  .climate-stat-card small,
+  .climate-recommendation p,
+  .climate-updated,
+  .diario-card-meta,
+  .diario-card-content > p,
+  .mapa-dashboard .map-filter-button,
+  .mapa-dashboard .mapa-search input,
+  .mapa-dashboard .talhao-card-main span,
+  .mapa-dashboard .talhao-card-meta,
+  .mapa-dashboard .talhao-card-footer small,
+  .estoque-dashboard p,
+  .estoque-dashboard small,
+  .activities-dashboard .activity-info small,
+  .activities-dashboard .activity-info > span,
+  .activities-dashboard .activity-row-side small,
+  .drone-law-dashboard .drone-law-featured small,
+  .drone-law-dashboard .drone-law-topic-detail p,
+  .drone-law-dashboard .drone-law-link-copy small,
+  .drone-law-dashboard .drone-law-quick-tips p,
+  .drone-law-dashboard .drone-law-responsibility p,
+  .drone-law-dashboard .drone-law-note,
+  .profile-redesign small,
+  .team-page small,
+  .team-page p {
+    font-size: 0.74rem !important;
+    line-height: 1.35 !important;
+  }
+
+  .climate-stat-card strong,
+  .climate-recommendation strong,
+  .diario-card-header h3,
+  .diario-card-title,
+  .mapa-dashboard .talhao-card-main strong,
+  .mapa-dashboard .talhoes-header strong,
+  .estoque-dashboard strong,
+  .activities-dashboard .activity-info strong,
+  .activities-dashboard .activities-summary > h2,
+  .activities-dashboard .activities-recent > h2,
+  .drone-law-dashboard .drone-law-featured strong,
+  .drone-law-dashboard .drone-law-section-heading h2,
+  .drone-law-dashboard .drone-law-card strong,
+  .drone-law-dashboard .drone-law-topic-detail h3,
+  .drone-law-dashboard .drone-law-link-copy strong,
+  .drone-law-dashboard .drone-law-responsibility strong,
+  .profile-redesign .profile-section-title h2,
+  .profile-redesign .profile-setting-item strong,
+  .team-section-header h2,
+  .team-metrics strong,
+  .team-page strong {
+    font-size: 0.98rem !important;
+    line-height: 1.22 !important;
+  }
+
+  .activities-dashboard .atividades-stats .stat-card strong,
+  .mapa-dashboard .total-area-badge > strong,
+  .profile-redesign .profile-summary-grid strong {
+    font-size: 1.18rem !important;
+  }
+
+  .activities-dashboard .atividades-stats .stat-card p,
+  .profile-redesign .profile-summary-grid small,
+  .team-metrics p {
+    font-size: 0.64rem !important;
+  }
+
+  :is(.diagnostic-container, .climate-dashboard, .diario-container, .mapa-dashboard, .estoque-dashboard, .activities-dashboard, .drone-law-dashboard, .profile-redesign, .team-page) :where(input, select, textarea) {
+    font-size: 0.86rem !important;
+  }
+
+  :is(.diagnostic-container, .climate-dashboard, .diario-container, .mapa-dashboard, .estoque-dashboard, .activities-dashboard, .drone-law-dashboard, .profile-redesign, .team-page) :where(button:not(.nav__item-btn):not(.notification-btn):not(.accessibility-toggle)) {
+    font-size: 0.82rem !important;
+  }
+
+  .explore-container--clima,
+  .explore-container--clima .climate-dashboard {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .explore-container--clima .climate-dashboard {
+    padding-bottom: calc(146px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .explore-container--clima .climate-stats {
+    gap: 6px !important;
+    margin-top: -84px !important;
+  }
+
+  .explore-container--clima .climate-stat-card {
+    min-height: 66px !important;
+    aspect-ratio: auto !important;
+    display: grid !important;
+    grid-template-columns: 22px minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: 5px !important;
+    padding: 8px 7px !important;
+  }
+
+  .explore-container--clima .climate-stat-card > .material-symbols-outlined {
+    width: 22px !important;
+    flex: 0 0 22px !important;
+    font-size: 20px !important;
+  }
+
+  .explore-container--clima .climate-stat-card div {
+    display: grid !important;
+    align-content: center !important;
+    gap: 2px !important;
+  }
+
+  .explore-container--clima .climate-stat-card small {
+    font-size: 0.58rem !important;
+    line-height: 1.1 !important;
+    white-space: nowrap !important;
+  }
+
+  .explore-container--clima .climate-stat-card strong {
+    font-size: 0.78rem !important;
+    line-height: 1.12 !important;
+    white-space: nowrap !important;
+  }
+
+  .explore-container--clima .climate-stat-card em {
+    font-size: 0.52rem !important;
+    line-height: 1.05 !important;
+    white-space: nowrap !important;
+  }
+
+  .explore-container--clima .climate-recommendations {
+    margin-top: 18px !important;
+    min-height: 0 !important;
+    aspect-ratio: auto !important;
+    padding-bottom: 18px !important;
+  }
+
+  .explore-container--clima .climate-recommendation {
+    min-height: 92px !important;
+    align-items: center !important;
+    padding: 12px 11px !important;
+  }
+
+  .explore-container--clima .climate-recommendation p {
+    font-size: 0.66rem !important;
+    line-height: 1.3 !important;
   }
 }

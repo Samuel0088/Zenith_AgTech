@@ -1226,10 +1226,10 @@
 }
 
 .climate-condition img {
-  width: 74px;
-  height: 58px;
+  width: 88px;
+  height: 70px;
   display: block;
-  margin: -2px auto -10px;
+  margin: -8px auto -12px;
   object-fit: contain;
   filter: drop-shadow(0 6px 7px rgba(0, 0, 0, 0.2));
 }
@@ -1458,7 +1458,7 @@
 @media (max-width: 550px) {
   .climate-hero {
     min-height: 0;
-    aspect-ratio: 1 / 0.98;
+    aspect-ratio: 1 / 0.91;
   }
 
   .climate-overview-card {
@@ -1475,6 +1475,10 @@
     min-height: 0;
   }
 
+  .climate-stats {
+    margin-top: -74px;
+  }
+
   .climate-stat-card {
     min-height: 0;
     aspect-ratio: 1.83;
@@ -1486,9 +1490,9 @@
   }
 }
 
-@media (min-width: 390px) and (max-width: 550px), (pointer: coarse) and (min-width: 390px) and (max-width: 900px) {
+@media (min-width: 390px) and (max-width: 550px), (pointer: coarse) and (min-width: 390px) and (max-width: 550px) {
   .climate-hero {
-    aspect-ratio: 1 / 1.05;
+    aspect-ratio: 1 / 0.94;
     padding-top: 26px;
   }
 
@@ -1505,6 +1509,17 @@
     min-height: 164px;
   }
 
+  .climate-condition {
+    width: 104px;
+    flex-basis: 104px;
+  }
+
+  .climate-condition img {
+    width: 102px;
+    height: 80px;
+    margin: -12px auto -14px;
+  }
+
   .climate-temperature strong {
     font-size: 4.65rem;
   }
@@ -1515,6 +1530,7 @@
 
   .climate-stats {
     gap: 10px;
+    margin-top: -88px;
   }
 
   .climate-stat-card {
@@ -1557,11 +1573,17 @@
 /* Mantem a pagina de clima rolavel no app instalado. */
 .explore-container--clima .climate-dashboard {
   min-height: 100dvh;
+  height: auto;
+  max-height: none;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
   scrollbar-width: none;
+}
+
+.explore-container--clima > .tab-content {
+  overflow: visible;
 }
 
 .explore-container--clima .climate-dashboard::-webkit-scrollbar {

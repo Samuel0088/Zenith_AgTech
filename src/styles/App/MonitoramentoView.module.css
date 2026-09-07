@@ -1508,6 +1508,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  margin-bottom: 8px;
   padding: 0 3px;
 }
 

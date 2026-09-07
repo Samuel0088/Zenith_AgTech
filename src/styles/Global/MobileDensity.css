@@ -1,0 +1,399 @@
+@media (max-width: 550px), (pointer: coarse) and (max-width: 900px) {
+  :root {
+    --app-mobile-canvas-width: 100%;
+    --app-mobile-nav-width: 382px;
+  }
+
+  .home-shell,
+  .explore-container,
+  .profile-container-tech,
+  .team-page,
+  .plans-page,
+  .employee-work-page {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-inline: auto !important;
+  }
+
+  .home-shell .home-container,
+  .home-shell .home-app-header .header-top,
+  .explore-container .explore-tabs-modern,
+  .profile-container-tech,
+  .team-page,
+  .diario-container,
+  .mapa-container,
+  .estoque-container,
+  .atividades-container,
+  .drone-law-container,
+  .all-history-container,
+  .batch-result-page {
+    padding-left: var(--app-content-gutter) !important;
+    padding-right: var(--app-content-gutter) !important;
+  }
+
+  .nav,
+  body:has(.home-shell) .nav {
+    width: min(calc(100vw - 28px), var(--app-mobile-nav-width)) !important;
+    min-height: 64px !important;
+  }
+
+  .nav__items {
+    min-height: 64px !important;
+    padding: 6px 10px !important;
+  }
+
+  .nav__item-btn {
+    width: 52px !important;
+    max-width: 52px !important;
+    height: 52px !important;
+  }
+
+  .nav__label {
+    width: 52px !important;
+    max-width: 52px !important;
+    font-size: 9.2px !important;
+  }
+
+  .nav__item-btn--primary,
+  .nav__item-btn--primary:hover,
+  .nav__item-btn--primary.nav__item-btn--active {
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    max-width: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
+  }
+
+  .home-container .app-footer {
+    width: calc(100% + (var(--app-content-gutter) * 2)) !important;
+    margin-left: calc(var(--app-content-gutter) * -1) !important;
+    margin-right: calc(var(--app-content-gutter) * -1) !important;
+  }
+
+  .home-shell .home-field-card {
+    margin-top: -18px !important;
+  }
+
+  .home-shell .weather-location h1 {
+    font-size: 1.8rem !important;
+    line-height: 1.08 !important;
+  }
+
+  .home-shell .weather-location p,
+  .home-shell .home-weather-hero p,
+  .home-shell .weather-farm-label {
+    font-size: 0.9rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .home-shell .weather-main-value strong {
+    font-size: 4.2rem !important;
+  }
+
+  .home-shell .weather-main-value span {
+    font-size: 1.72rem !important;
+  }
+
+  .home-shell .weather-stat-pill small {
+    font-size: 0.62rem !important;
+    line-height: 1.08 !important;
+  }
+
+  .home-shell .weather-stat-pill strong {
+    font-size: 0.84rem !important;
+    line-height: 1.06 !important;
+  }
+
+  .field-card-header strong {
+    font-size: 1rem !important;
+  }
+
+  .field-card-header span {
+    font-size: 0.76rem !important;
+  }
+
+  .field-card-header em {
+    font-size: 0.75rem !important;
+  }
+
+  .field-image-overlay span,
+  .field-image-overlay strong {
+    font-size: 0.82rem !important;
+  }
+
+  .field-image-wrap img {
+    object-position: center 38% !important;
+    transform: translateY(-8px) scale(1.06) !important;
+    transform-origin: center top !important;
+  }
+
+  .home-quick-summary h2,
+  .section-title {
+    font-size: 1.12rem !important;
+  }
+
+  .quick-summary-heading small {
+    font-size: 0.72rem !important;
+  }
+
+  .quick-summary-card strong {
+    font-size: 0.9rem !important;
+  }
+
+  .quick-summary-card p {
+    font-size: 0.76rem !important;
+  }
+
+  .activity-title,
+  .explore-label {
+    font-size: 0.84rem !important;
+  }
+
+  .activity-description,
+  .activity-time,
+  .explore-sublabel {
+    font-size: 0.66rem !important;
+  }
+}
+
+@media (min-width: 390px) and (max-width: 550px), (pointer: coarse) and (min-width: 390px) and (max-width: 900px) {
+  .home-shell .home-weather-hero {
+    min-height: 264px !important;
+    padding-top: 0 !important;
+  }
+
+  .home-shell .weather-hero-top {
+    min-height: 154px !important;
+    grid-template-columns: minmax(142px, 1fr) 150px !important;
+    align-items: center !important;
+    padding-top: 0 !important;
+  }
+
+  .home-shell .weather-hero-top > :first-child {
+    transform: translateY(0) !important;
+  }
+
+  .home-shell .weather-location h1 {
+    font-size: 1.8rem !important;
+    line-height: 1.08 !important;
+  }
+
+  .home-shell .weather-location p {
+    font-size: 0.9rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .home-shell .weather-main-value strong {
+    font-size: 4.2rem !important;
+  }
+
+  .home-shell .weather-main-value span {
+    font-size: 1.72rem !important;
+  }
+
+  .home-shell .weather-condition-art {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .home-shell .weather-illustration {
+    top: 6px !important;
+    right: calc(var(--app-content-gutter) * -1) !important;
+    width: 228px !important;
+    height: 172px !important;
+    transform: translateY(-10px) rotate(-2deg) !important;
+  }
+
+  .home-shell .weather-illustration img {
+    transform: scale(1.16) !important;
+  }
+
+  .home-shell .weather-stat-grid {
+    gap: 7px !important;
+    margin-top: 11px !important;
+  }
+
+  .home-shell .weather-stat-pill {
+    min-height: 60px !important;
+    padding: 8px 5px 7px !important;
+  }
+
+  .home-shell .weather-stat-pill > .material-symbols-outlined {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 17px !important;
+  }
+
+  .home-shell .weather-stat-pill small {
+    font-size: 0.62rem !important;
+    line-height: 1.08 !important;
+  }
+
+  .home-shell .weather-stat-pill strong {
+    font-size: 0.84rem !important;
+    line-height: 1.06 !important;
+  }
+
+  .quick-summary-card {
+    min-height: 82px !important;
+  }
+
+  .explore-section {
+    margin-bottom: 28px !important;
+  }
+
+  .explore-grid {
+    gap: 12px !important;
+    margin-top: 16px !important;
+  }
+
+  .explore-card {
+    min-height: 136px !important;
+    gap: 9px !important;
+    padding: 16px 10px !important;
+    border-radius: 12px !important;
+  }
+
+  .explore-icon {
+    width: 52px !important;
+    height: 52px !important;
+    border-radius: 12px !important;
+  }
+
+  .explore-icon span {
+    font-size: 25px !important;
+  }
+
+  .explore-label {
+    font-size: 0.84rem !important;
+  }
+
+  .explore-sublabel {
+    font-size: 0.66rem !important;
+  }
+
+  .activity-card {
+    min-height: initial !important;
+  }
+
+  :is(.explore-container--monitoramento, .explore-container--clima, .explore-container--diario, .explore-container--mapa, .explore-container--estoque, .explore-container--atividades, .explore-container--legislacao, .explore-container--diagnostico) .explore-tab {
+    min-height: 38px !important;
+    padding: 0 12px !important;
+    gap: 6px !important;
+    font-size: 0.62rem !important;
+  }
+
+  :is(.explore-container--monitoramento, .explore-container--clima, .explore-container--diario, .explore-container--mapa, .explore-container--estoque, .explore-container--atividades, .explore-container--legislacao, .explore-container--diagnostico) .explore-tab .material-symbols-outlined {
+    font-size: 17px !important;
+  }
+
+  .drone-law-container.drone-law-dashboard {
+    gap: 12px !important;
+  }
+
+  .drone-law-dashboard .drone-law-hero {
+    height: 172px !important;
+  }
+
+  .drone-law-dashboard .drone-law-hero-copy {
+    top: 56px !important;
+  }
+
+  .drone-law-dashboard .drone-law-hero h1 {
+    font-size: 1.58rem !important;
+  }
+
+  .drone-law-dashboard .drone-law-hero p {
+    max-width: 220px !important;
+    font-size: 0.62rem !important;
+  }
+
+  .drone-law-dashboard .drone-law-featured {
+    grid-template-columns: 38px minmax(0, 1fr) auto !important;
+    min-height: 72px !important;
+    padding: 10px !important;
+  }
+
+  .drone-law-dashboard .drone-law-featured-icon {
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 21px !important;
+  }
+
+  .drone-law-dashboard .drone-law-featured strong {
+    font-size: 0.67rem !important;
+  }
+
+  .drone-law-dashboard .drone-law-featured small {
+    font-size: 0.5rem !important;
+  }
+
+  .drone-law-dashboard .drone-law-featured-action {
+    min-height: 28px !important;
+    font-size: 0.5rem !important;
+  }
+
+  .drone-law-dashboard .drone-law-card {
+    min-height: 78px !important;
+    gap: 6px !important;
+    padding: 8px 5px !important;
+  }
+
+  .drone-law-dashboard .drone-law-links a {
+    grid-template-columns: 38px minmax(0, 1fr) 17px !important;
+    min-height: 55px !important;
+    padding: 8px 9px !important;
+  }
+
+  .diario-container {
+    gap: 12px !important;
+  }
+
+  .diario-hero {
+    min-height: 190px !important;
+    padding-top: 24px !important;
+  }
+
+  .diario-header h2 {
+    font-size: 1.62rem !important;
+  }
+
+  .diario-add-btn {
+    min-height: 50px !important;
+    font-size: 0.82rem !important;
+  }
+
+  .diario-card {
+    grid-template-columns: 48px minmax(0, 1fr) 28px !important;
+    min-height: 96px !important;
+    padding: 10px !important;
+  }
+
+  .diario-card-icon,
+  .type-icon {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .climate-hero {
+    padding-top: 20px !important;
+  }
+
+  .climate-overview-card {
+    min-height: 148px !important;
+  }
+
+  .climate-temperature strong {
+    font-size: 4rem !important;
+  }
+
+  .climate-stat-card {
+    padding: 8px !important;
+  }
+
+  .profile-container-tech.profile-redesign {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 16px) !important;
+    padding-bottom: calc(118px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}

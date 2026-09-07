@@ -397,3 +397,122 @@
     padding-bottom: calc(118px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
+
+@media (min-width: 350px) and (min-height: 720px) and (max-width: 550px),
+  (pointer: coarse) and (min-width: 350px) and (min-height: 720px) and (max-width: 900px) {
+  .home-shell .weather-location h1 {
+    font-size: 1.96rem !important;
+    line-height: 1.05 !important;
+  }
+
+  .home-shell .weather-location p {
+    font-size: 0.96rem !important;
+  }
+
+  .home-shell .weather-main-value strong {
+    font-size: 4.55rem !important;
+  }
+
+  .home-shell .weather-main-value span {
+    font-size: 1.86rem !important;
+  }
+
+  .home-shell .home-weather-hero p,
+  .home-shell .weather-farm-label {
+    font-size: 0.96rem !important;
+    line-height: 1.18 !important;
+  }
+
+  .home-shell .weather-illustration {
+    top: -4px !important;
+    right: calc(var(--app-content-gutter) * -1.4) !important;
+    width: 260px !important;
+    height: 194px !important;
+    transform: translateY(-13px) rotate(-2deg) !important;
+  }
+
+  .home-shell .weather-illustration img {
+    transform: scale(1.18) !important;
+  }
+
+  .home-shell .weather-stat-pill small {
+    font-size: 0.68rem !important;
+  }
+
+  .home-shell .weather-stat-pill strong {
+    font-size: 0.92rem !important;
+  }
+
+  .field-card-header strong {
+    font-size: 1.08rem !important;
+  }
+
+  .field-card-header span {
+    font-size: 0.84rem !important;
+  }
+
+  .field-card-header em {
+    font-size: 0.82rem !important;
+  }
+
+  .field-image-overlay span,
+  .field-image-overlay strong {
+    font-size: 0.9rem !important;
+  }
+
+  .home-quick-summary h2,
+  .section-title {
+    font-size: 1.26rem !important;
+  }
+
+  .quick-summary-heading small {
+    font-size: 0.78rem !important;
+  }
+
+  .quick-summary-card strong {
+    font-size: 1rem !important;
+  }
+
+  .quick-summary-card p {
+    font-size: 0.82rem !important;
+  }
+
+  .flight-action-btn .btn-title {
+    font-size: 1.06rem !important;
+  }
+
+  .admin-team-card strong,
+  .activity-title,
+  .explore-label {
+    font-size: 0.96rem !important;
+  }
+
+  .admin-team-card p,
+  .activity-description,
+  .activity-time,
+  .metric,
+  .explore-sublabel {
+    font-size: 0.74rem !important;
+    line-height: 1.28 !important;
+  }
+
+  .install-app-trigger__text strong {
+    font-size: 0.96rem !important;
+  }
+
+  .install-app-trigger__text small,
+  .footer-description,
+  .footer-section ul li a,
+  .footer-stats span,
+  .footer-copyright p {
+    font-size: 0.78rem !important;
+  }
+
+  .footer-logo span:last-child {
+    font-size: 1.24rem !important;
+  }
+
+  .footer-section h5 {
+    font-size: 0.86rem !important;
+  }
+}

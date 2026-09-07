@@ -400,6 +400,26 @@
 
 @media (min-width: 350px) and (min-height: 720px) and (max-width: 550px),
   (pointer: coarse) and (min-width: 350px) and (min-height: 720px) and (max-width: 900px) {
+  .home-shell {
+    --home-large-phone-gutter: 22px;
+  }
+
+  .home-shell .home-container,
+  .home-shell .home-app-header .header-top {
+    padding-left: var(--home-large-phone-gutter) !important;
+    padding-right: var(--home-large-phone-gutter) !important;
+  }
+
+  body:has(.home-shell) .nav {
+    width: min(calc(100vw - 56px), 354px) !important;
+  }
+
+  .home-container .app-footer {
+    width: calc(100% + (var(--home-large-phone-gutter) * 2)) !important;
+    margin-left: calc(var(--home-large-phone-gutter) * -1) !important;
+    margin-right: calc(var(--home-large-phone-gutter) * -1) !important;
+  }
+
   .home-shell .weather-location h1 {
     font-size: 1.96rem !important;
     line-height: 1.05 !important;
@@ -425,7 +445,7 @@
 
   .home-shell .weather-illustration {
     top: -4px !important;
-    right: calc(var(--app-content-gutter) * -1.4) !important;
+    right: calc(var(--home-large-phone-gutter) * -1.15) !important;
     width: 260px !important;
     height: 194px !important;
     transform: translateY(-13px) rotate(-2deg) !important;

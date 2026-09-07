@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="color-scheme" content="dark light" />
-    <meta name="theme-color" content="#163020">
-    <meta name="msapplication-navbutton-color" content="#163020" />
+    <meta name="theme-color" content="#ffffff">
+    <meta name="msapplication-navbutton-color" content="#ffffff" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="application-name" content="Zenith" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -22,35 +22,16 @@
       #root {
         min-height: 100%;
         margin: 0;
-        background-color: #102419;
-        background:
-          radial-gradient(circle at 82% 18%, rgba(86, 168, 112, 0.38), transparent 34%),
-          linear-gradient(135deg, #102419 0%, #1e4229 54%, #3d8057 100%);
+        background-color: #ffffff;
       }
 
       body {
         overflow-x: hidden;
       }
-
-      .boot-splash {
-        min-height: 100vh;
-        min-height: 100dvh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #14d98b;
-        font-family: Inter, "Segoe UI", system-ui, sans-serif;
-        font-size: clamp(2.2rem, 9vw, 4.2rem);
-        font-weight: 900;
-        line-height: 1;
-        text-shadow: 0 16px 40px rgba(20, 217, 139, 0.18);
-      }
     </style>
   </head>
   <body>
-    <div id="root">
-      <div class="boot-splash">Zenith</div>
-    </div>
+    <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

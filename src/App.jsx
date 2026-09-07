@@ -20,7 +20,6 @@ import EmployeeWork from "./pages/App/EmployeeWork"
 import AdminTeamDashboard from "./pages/App/AdminTeamDashboard"
 
 // Componentes
-import SplashScreen from "./components/App/Global/SplashScreen"
 import InstallPrompt from "./components/App/Global/InstallPrompt"
 import InstallSuccess from "./components/App/Global/InstallSuccess"
 import UpdatePrompt from "./components/App/Global/UpdatePrompt"
@@ -196,7 +195,7 @@ function AnimatedRoutes({ setAppLoading, onInstallRequest, isInstalled }) {
 }
 
 function App() {
-  const [loading, setLoading] = useState(false)
+  const setAppLoading = () => {}
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const [showInstallPrompt, setShowInstallPrompt] = useState(false)
   const [showInstallSuccess, setShowInstallSuccess] = useState(false)
@@ -365,55 +364,47 @@ const handleAppUpdate = () => {
   window.location.reload()
 }
 
-const finishInitialSplash = () => {
-  setLoading(false)
-}
-
   return (
     <BrowserRouter>
       <SystemBarTheme />
       <AnimatePresence mode="wait">
-        {loading ? (
-          <SplashScreen key="splash" onComplete={finishInitialSplash} />
-        ) : (
-          <>
-            {/* Prompt de instalação */}
-            {showInstallPrompt && !isInstalled && (
-              <InstallPrompt 
-                onInstall={handleInstall}
-                onClose={() => setShowInstallPrompt(false)}
-                isIOS={isIOS}
-                isAndroid={isAndroid}
-                isChromeAndroid={isChromeAndroid}
-                hasPrompt={!!(deferredPrompt || window.__zenithDeferredInstallPrompt)}
-              />
-            )}
-
-            {/* Mensagem de sucesso após instalação */}
-            {showInstallSuccess && (
-              <InstallSuccess 
-                onClose={() => setShowInstallSuccess(false)}
-                isIOS={isIOS}
-                isAndroid={isAndroid}
-              />
-            )}
-
-            {isInstalled && showUpdatePrompt && (
-              <UpdatePrompt
-                onUpdate={handleAppUpdate}
-                onClose={() => setShowUpdatePrompt(false)}
-              />
-            )}
-            
-            <AnimatedRoutes
-              setAppLoading={setLoading}
-              onInstallRequest={handleInstallRequest}
-              isInstalled={isInstalled}
+        <>
+          {/* Prompt de instalação */}
+          {showInstallPrompt && !isInstalled && (
+            <InstallPrompt 
+              onInstall={handleInstall}
+              onClose={() => setShowInstallPrompt(false)}
+              isIOS={isIOS}
+              isAndroid={isAndroid}
+              isChromeAndroid={isChromeAndroid}
+              hasPrompt={!!(deferredPrompt || window.__zenithDeferredInstallPrompt)}
             />
-            <RouteChangeLoader />
-            <AccessibilityGate />
-          </>
-        )}
+          )}
+
+          {/* Mensagem de sucesso após instalação */}
+          {showInstallSuccess && (
+            <InstallSuccess 
+              onClose={() => setShowInstallSuccess(false)}
+              isIOS={isIOS}
+              isAndroid={isAndroid}
+            />
+          )}
+
+          {isInstalled && showUpdatePrompt && (
+            <UpdatePrompt
+              onUpdate={handleAppUpdate}
+              onClose={() => setShowUpdatePrompt(false)}
+            />
+          )}
+          
+          <AnimatedRoutes
+            setAppLoading={setAppLoading}
+            onInstallRequest={handleInstallRequest}
+            isInstalled={isInstalled}
+          />
+          <RouteChangeLoader />
+          <AccessibilityGate />
+        </>
       </AnimatePresence>
     </BrowserRouter>
   )

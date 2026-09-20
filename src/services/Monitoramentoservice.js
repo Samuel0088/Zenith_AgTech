@@ -141,7 +141,8 @@ export async function analisarImagem(file) {
       let detalhe = `Erro do servidor (${response.status})`;
       try {
         const body = await response.json();
-        detalhe = body.detail || detalhe;
+        const limitError = body?.detail?.code === "USAGE_LIMIT_REACHED" ? body.detail : body;
+        detalhe = limitError?.message || body.detail || detalhe;
       } catch {
         // ignora erro de parse
       }
@@ -166,3 +167,4 @@ export async function analisarImagem(file) {
     clearTimeout(timeoutId);
   }
 }
+import { auth } from "./firebase";

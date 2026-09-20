@@ -36,6 +36,12 @@ const UFS_BRASIL = [
   "SP", "SE", "TO",
 ]
 
+const PLANOS_TCC = [
+  { id: "agro-vision", nome: "Agro Vision", valor: "R$ 799/ano", detalhe: "Até 50 ha" },
+  { id: "agro-imperial", nome: "Agro Imperial", valor: "R$ 1.200/ano", detalhe: "Até 200 ha" },
+  { id: "agro-enterprise", nome: "Agro Enterprise", valor: "Sob consulta", detalhe: "Uso empresarial" },
+]
+
 export default function CadastroCompleto({ setAppLoading }) {
   const navigate = useNavigate()
   const { setLanguage } = useLanguage()
@@ -49,6 +55,8 @@ export default function CadastroCompleto({ setAppLoading }) {
   })
 
   const [userId, setUserId] = useState(null)
+  const [documentoFicticioConfirmado, setDocumentoFicticioConfirmado] = useState(false)
+  const [telefoneFicticioConfirmado, setTelefoneFicticioConfirmado] = useState(false)
 
   const [userData, setUserData] = useState({
     name: "",
@@ -58,12 +66,14 @@ export default function CadastroCompleto({ setAppLoading }) {
     email: "",
     password: "",
     language: "",
+    plan: "agro-vision",
     role: ACCOUNT_ROLES.ADMIN,
   })
 
   const [farmData, setFarmData] = useState({
     name: "",
     tipo_proprietario: "",
+    documento_proprietario: "",
     cep: "",
     bairro: "",
     municipio: "",
@@ -183,6 +193,16 @@ export default function CadastroCompleto({ setAppLoading }) {
       formattedValue = formatPhone(value)
     }
 
+    if (name === "tipo_proprietario") {
+      setFarmData({ ...farmData, tipo_proprietario: value, documento_proprietario: "" })
+      setAlertMessage({ type: "", text: "" })
+      return
+    }
+
+    if (name === "documento_proprietario") {
+      formattedValue = formatDocument(value, farmData.tipo_proprietario === "PF" ? "CPF" : "PJ")
+    }
+
     setFarmData({
       ...farmData,
       [name]: formattedValue,
@@ -243,21 +263,26 @@ export default function CadastroCompleto({ setAppLoading }) {
       return false
     }
 
-    if (userData.type === "CPF" && !isValidCPF(documentDigits)) {
+    if (userData.type === "CPF" && documentDigits.length !== 11) {
       setAlertMessage({
         type: "error",
-        text: "Informe um CPF válido.",
+        text: "Informe um CPF fictício com 11 dígitos.",
       })
 
       return false
     }
 
-    if (userData.type === "PJ" && !isValidCNPJ(documentDigits)) {
+    if (userData.type === "PJ" && documentDigits.length !== 14) {
       setAlertMessage({
         type: "error",
-        text: "Informe um CNPJ válido.",
+        text: "Informe um CNPJ fictício com 14 dígitos.",
       })
 
+      return false
+    }
+
+    if (!documentoFicticioConfirmado) {
+      setAlertMessage({ type: "error", text: "Confirme que o documento informado é fictício e será usado apenas no TCC." })
       return false
     }
 
@@ -404,12 +429,17 @@ export default function CadastroCompleto({ setAppLoading }) {
       return false
     }
 
-    if (!isValidBrazilianPhone(phoneDigits)) {
+    if (!/^\d{10,11}$/.test(phoneDigits)) {
       setAlertMessage({
         type: "error",
-        text: "Informe um telefone válido com DDD.",
+        text: "Informe um telefone fictício com DDD e 10 ou 11 dígitos.",
       })
 
+      return false
+    }
+
+    if (!telefoneFicticioConfirmado) {
+      setAlertMessage({ type: "error", text: "Confirme que o telefone informado é fictício e será usado apenas no TCC." })
       return false
     }
 
@@ -453,6 +483,8 @@ export default function CadastroCompleto({ setAppLoading }) {
           document: userData.document,
           email: userCred.user.email || userData.email,
           language: userData.language,
+          plan: userData.plan,
+          planName: PLANOS_TCC.find((plan) => plan.id === userData.plan)?.nome || "Agro Vision",
           hectares: 0,
           role: ACCOUNT_ROLES.ADMIN,
           position: "Administrador",
@@ -769,11 +801,11 @@ export default function CadastroCompleto({ setAppLoading }) {
     <div className="cadastro-page" data-system-bar-color="#091c13">
 
       <div className="cadastro-hero">
-        <div className="login-hero__overlay" />
+        <div className="cadastro-hero__overlay" />
 
-        <div className="login-hero__content">
+        <div className="cadastro-hero__content">
 
-          <div className="login-logo">
+          <div className="cadastro-logo">
             <img
               className="logo-img"
               src="assets/image/Logo-redonda.png"
@@ -781,11 +813,11 @@ export default function CadastroCompleto({ setAppLoading }) {
             />
           </div>
 
-          <p className="login-hero__subtitle">
+          <p className="cadastro-hero__subtitle">
             Cadastre sua propriedade rural
           </p>
 
-          <h1 className="login-hero__title">
+          <h1 className="cadastro-hero__title">
             Cadastro
           </h1>
 
@@ -880,8 +912,8 @@ export default function CadastroCompleto({ setAppLoading }) {
 
                 <label>
                   {userData.type === "CPF"
-                    ? "CPF"
-                    : "CNPJ"}
+                    ? "CPF Fictício"
+                    : "CNPJ Fictício"}
                 </label>
 
                 <input
@@ -908,6 +940,11 @@ export default function CadastroCompleto({ setAppLoading }) {
                   }
                   maxLength={userData.type === "CPF" ? 14 : 18}
                 />
+                <small className="cadastro-tcc-help">Digite somente números; a pontuação é automática. Não use documento real. Exemplo: {userData.type === "CPF" ? "123.456.789-00" : "12.345.678/0001-00"}.</small>
+                <label className="cadastro-tcc-confirm">
+                  <input type="checkbox" checked={documentoFicticioConfirmado} onChange={(event) => setDocumentoFicticioConfirmado(event.target.checked)} />
+                  Confirmo que este documento é fictício e será usado apenas no TCC.
+                </label>
 
               </div>
             )}
@@ -924,6 +961,28 @@ export default function CadastroCompleto({ setAppLoading }) {
                 maxLength={120}
               />
             </div>
+
+            <section className="cadastro-planos" aria-labelledby="cadastro-planos-title">
+              <div className="cadastro-planos__header">
+                <label id="cadastro-planos-title">Escolha seu plano</label>
+                <small>Você pode alterar depois no perfil.</small>
+              </div>
+              <p className="cadastro-tcc-notice">🎓 Valores simbólicos para demonstração acadêmica. Nenhuma cobrança real é realizada.</p>
+              <div className="cadastro-planos__grid">
+                {PLANOS_TCC.map((plano) => (
+                  <button
+                    key={plano.id}
+                    type="button"
+                    className={userData.plan === plano.id ? "cadastro-plano cadastro-plano--ativo" : "cadastro-plano"}
+                    onClick={() => handleUserChange({ target: { name: "plan", value: plano.id } })}
+                  >
+                    <strong>{plano.nome}</strong>
+                    <span>{plano.valor}</span>
+                    <small>{plano.detalhe}</small>
+                  </button>
+                ))}
+              </div>
+            </section>
 
             <div className="input-group">
               <label>Senha</label>
@@ -1011,6 +1070,22 @@ export default function CadastroCompleto({ setAppLoading }) {
               </select>
             </div>
 
+            {farmData.tipo_proprietario && (
+              <div className="input-group">
+                <label>{farmData.tipo_proprietario === "PF" ? "CPF Fictício" : "CNPJ Fictício"}</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  name="documento_proprietario"
+                  value={farmData.documento_proprietario}
+                  onChange={handleFarmChange}
+                  placeholder={farmData.tipo_proprietario === "PF" ? "000.000.000-00" : "00.000.000/0001-00"}
+                  maxLength={farmData.tipo_proprietario === "PF" ? 14 : 18}
+                />
+                <small className="cadastro-tcc-help">Digite somente números; a pontuação é automática. Não use documento real. Exemplo: {farmData.tipo_proprietario === "PF" ? "123.456.789-00" : "12.345.678/0001-00"}.</small>
+              </div>
+            )}
+
             <div className="input-row">
 
               <div className="input-group">
@@ -1097,6 +1172,11 @@ export default function CadastroCompleto({ setAppLoading }) {
                   placeholder="(00) 00000-0000"
                   maxLength={15}
                 />
+                <small className="cadastro-tcc-help">Digite somente números; a pontuação é automática. Não use telefone real. Exemplo: (11) 98765-4321.</small>
+                <label className="cadastro-tcc-confirm">
+                  <input type="checkbox" checked={telefoneFicticioConfirmado} onChange={(event) => setTelefoneFicticioConfirmado(event.target.checked)} />
+                  Confirmo que este telefone é fictício e será usado apenas no TCC.
+                </label>
               </div>
 
             </div>

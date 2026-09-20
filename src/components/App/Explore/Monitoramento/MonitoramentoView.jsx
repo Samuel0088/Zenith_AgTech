@@ -5,6 +5,7 @@ import OverlayResult from "./OverlayResult";
 import MetricsPanel  from "./MetricsPanel";
 import { downloadMonitoringHistoryReport } from "./monitoringReportPdf";
 import { interpretar } from "../../utils/Interpretations";
+import { useFeatureAccess } from "../../../../hooks/useFeatureAccess";
 import styles from "../../../../styles/App/MonitoramentoView.module.css";
 
 const PLANTING_HISTORY_KEY = "plantingAnalysisHistory";
@@ -40,7 +41,8 @@ function toPercentage(value) {
  *  [Botão: Nova análise]
  */
 export default function MonitoramentoView() {
-  const { analisar, resetar, result, loading, error, preview } = useMonitoramento();
+  const featureAccess = useFeatureAccess("monitoring");
+  const { analisar, resetar, result, loading, error, preview } = useMonitoramento(featureAccess.consume);
   const [history, setHistory] = useState(readPlantingHistory);
   const [showAllHistory, setShowAllHistory] = useState(false);
   const savedResultRef = useRef(null);
@@ -168,6 +170,13 @@ export default function MonitoramentoView() {
           <h2 className={styles.titulo}>Alinhamento da Plantação</h2>
           <p className={styles.subtitulo}>
             Analise o alinhamento e a uniformidade das fileiras
+          </p>
+          <p className={styles.usageLimit} aria-live="polite">
+            {featureAccess.loading
+              ? "Verificando o limite de análises..."
+              : featureAccess.fullAccess
+                ? "Acesso ilimitado para demonstração."
+                : `Limite de demonstração: você utilizou ${featureAccess.used} de 3 análises. Restam ${featureAccess.remaining}.`}
           </p>
         </div>
 

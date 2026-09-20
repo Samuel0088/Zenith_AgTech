@@ -2,7 +2,7 @@
 
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap');
 
-:root {
+.cadastro-page {
   --surface-page: #091c13;
 
   --surface-card: #f8fcf6;
@@ -38,13 +38,16 @@
   --font-body: 'DM Sans', sans-serif;
 }
 
-* {
+.cadastro-page,
+.cadastro-page *,
+.cadastro-page *::before,
+.cadastro-page *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-body {
+.cadastro-page {
   font-family: var(--font-body);
 }
 
@@ -71,7 +74,7 @@ body {
   max-height: 360px;
 
   background-image:
-    url("assets/image/img-fundoLogineCadastro.jpg");
+    url("/assets/image/img-fundoLogineCadastro.jpg");
 
   background-size: cover;
 
@@ -82,7 +85,7 @@ body {
   align-items: flex-end;
 }
 
-.login-hero__overlay {
+.cadastro-hero__overlay {
   position: absolute;
   inset: 0;
 
@@ -96,23 +99,25 @@ body {
     );
 }
 
-.login-hero__content {
+.cadastro-hero__content {
   position: relative;
   z-index: 1;
   padding: 0 26px 28px;
 }
 
-.login-logo {
+.cadastro-logo {
   margin-bottom: 22px;
 }
 
-.logo-img {
+.cadastro-logo .logo-img {
   width: 68px;
   height: 68px;
   border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, .35), 0 0 0 3px rgba(255, 255, 255, .15);
 }
 
-.login-hero__subtitle {
+.cadastro-hero__subtitle {
   font-size: 11px;
   font-weight: 700;
   color: white;
@@ -121,7 +126,7 @@ body {
   margin-bottom: 6px;
 }
 
-.login-hero__title {
+.cadastro-hero__title {
   font-size: clamp(46px, 14vw, 72px);
   color: white;
   font-weight: 700;
@@ -280,6 +285,91 @@ body {
 .cadastro-card .input-group input:not([type="checkbox"])::placeholder {
   color: var(--text-placeholder);
   opacity: 1;
+}
+
+.cadastro-tcc-help {
+  display: block;
+  margin-top: 7px;
+  color: #65776b;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.cadastro-card .input-group .cadastro-tcc-confirm {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 9px;
+  color: #4c6152;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.cadastro-card .input-group .cadastro-tcc-confirm input {
+  display: inline-block;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #2a7a42;
+}
+
+.cadastro-planos {
+  margin: 4px 0 2px;
+}
+
+.cadastro-planos__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cadastro-planos__header label {
+  color: var(--text-label);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.cadastro-planos__header small { color: var(--text-secondary); font-size: 11px; }
+
+.cadastro-tcc-notice {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(70, 137, 91, .22);
+  border-radius: 12px;
+  background: rgba(232, 244, 232, .65);
+  color: #42604a;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.cadastro-planos__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+
+.cadastro-plano {
+  min-height: 102px;
+  padding: 12px 9px;
+  border: 1px solid rgba(70, 137, 91, .22);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--text-label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.cadastro-plano strong, .cadastro-plano span, .cadastro-plano small { display: block; }
+.cadastro-plano strong { font-size: 12px; }
+.cadastro-plano span { margin-top: 7px; color: #2a7a42; font-size: 12px; font-weight: 800; }
+.cadastro-plano small { margin-top: 5px; color: var(--text-secondary); font-size: 10px; }
+.cadastro-plano--ativo { border-color: #2a7a42; background: #eff8ed; box-shadow: 0 0 0 3px rgba(42, 122, 66, .12); }
+
+@media (max-width: 430px) {
+  .cadastro-planos__grid { grid-template-columns: 1fr; }
+  .cadastro-plano { min-height: 72px; }
 }
 
 .cadastro-card .input-group select {
@@ -455,5 +545,16 @@ body {
 
     box-shadow:
       0 24px 80px rgba(0,0,0,.35);
+  }
+}
+
+@media (min-width: 1024px) {
+  .cadastro-page {
+    padding: 56px 24px;
+  }
+
+  .cadastro-card {
+    max-width: 560px;
+    padding: 44px 42px 48px;
   }
 }

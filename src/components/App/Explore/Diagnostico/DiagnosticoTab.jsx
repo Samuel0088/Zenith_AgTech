@@ -9,6 +9,7 @@ import AllHistory from "./AllHistory"
 import { formatDiagnosisName } from "./diagnosisLabels"
 import { diagnosticarLote } from "../../../../services/sojaApi"
 import { useLanguage } from "../../../../contexts/LanguageContext"
+import { useFeatureAccess } from "../../../../hooks/useFeatureAccess"
 import "../../../../styles/App/Diagnostico.css"
 import "../../../../styles/App/BatchDiagnosis.css"
 
@@ -159,6 +160,7 @@ export default function DiagnosticoTab() {
   const [selectionNotice, setSelectionNotice] = useState(null)
   const [selectionSource, setSelectionSource] = useState(null)
   const dashboardData = useMemo(() => createDashboardData(history, locale), [history, locale])
+  const featureAccess = useFeatureAccess("diagnosis")
 
   useEffect(() => {
     selectedImagesRef.current = selectedImages
@@ -418,6 +420,12 @@ export default function DiagnosticoTab() {
 
   const analyzeBatch = async () => {
     if (selectedImages.length === 0) return
+    const permission = await featureAccess.consume()
+    if (!permission.allowed) {
+      setResult({ status: "limite_atingido", resultado: "Limite atingido", mensagem: permission.limitReached ? "Você já utilizou as três análises disponíveis para este recurso." : permission.error?.message || "Não foi possível verificar seu limite." })
+      setStep("result")
+      return
+    }
 
     const controller = new AbortController()
     requestControllerRef.current = controller
@@ -521,6 +529,9 @@ export default function DiagnosticoTab() {
           <p>
             {t("diagnosis.subtitle")}{" "}
             <span className="highlight">{t("diagnosis.ai")}</span>
+          </p>
+          <p className="analysis-usage" aria-live="polite">
+            {featureAccess.loading ? "Carregando limite de análises..." : featureAccess.fullAccess ? "Acesso ilimitado" : `${featureAccess.used} de 3 análises usadas · ${featureAccess.remaining} restante${featureAccess.remaining === 1 ? "" : "s"}`}
           </p>
         </div>
 

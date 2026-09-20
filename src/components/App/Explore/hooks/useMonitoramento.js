@@ -10,7 +10,7 @@ import { analisarImagem, validarArquivo } from "../../../../services/Monitoramen
  *  - `resetar()` permite começar nova análise sem recarregar a tela
  *  - `useCallback` evita recriação desnecessária das funções
  */
-export function useMonitoramento() {
+export function useMonitoramento(consumeAccess) {
   const [result,  setResult]  = useState(null);
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState(null);
@@ -38,6 +38,12 @@ export function useMonitoramento() {
       return;
     }
 
+    const permission = await consumeAccess?.();
+    if (permission && !permission.allowed) {
+      setError(permission.limitReached ? "Você já utilizou as três análises disponíveis para este recurso." : permission.error?.message || "Não foi possível verificar seu limite.");
+      return;
+    }
+
     // Revoga URL anterior para liberar memória
     if (previewUrlRef.current) {
       URL.revokeObjectURL(previewUrlRef.current);
@@ -59,7 +65,7 @@ export function useMonitoramento() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [consumeAccess]);
 
   const resetar = useCallback(() => {
     if (previewUrlRef.current) {

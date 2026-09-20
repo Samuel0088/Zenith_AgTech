@@ -6,6 +6,7 @@ import { addDoc, collection, query, where, getDocs } from "firebase/firestore"
 import {
   accountIdentifierMessage,
   attachUniquePhoneToProfile,
+  maskAccountDocument,
   maskAccountPhone,
 } from "../../services/accountIdentity"
 import "../../styles/App/CadastrarFazenda.css"
@@ -17,6 +18,7 @@ export default function CadastrarFazenda({ setAppLoading }) {
   const [formData, setFormData] = useState({
     name: "",
     tipo_proprietario: "",
+    documento_proprietario: "",
     data_aquisicao: "",
     cep: "",
     bairro: "",
@@ -29,6 +31,18 @@ export default function CadastrarFazenda({ setAppLoading }) {
 
   function handleChange(e) {
     const { name, value } = e.target
+    if (name === "tipo_proprietario") {
+      setFormData({ ...formData, tipo_proprietario: value, documento_proprietario: "" })
+      return
+    }
+    if (name === "documento_proprietario") {
+      const digits = value.replace(/\D/g, "").slice(0, formData.tipo_proprietario === "PF" ? 11 : 14)
+      const formatted = formData.tipo_proprietario === "PF"
+        ? digits.replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d{1,2})$/, "$1-$2")
+        : digits.replace(/^(\d{2})(\d)/, "$1.$2").replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3").replace(/\.(\d{3})(\d)/, ".$1/$2").replace(/(\d{4})(\d)/, "$1-$2")
+      setFormData({ ...formData, [name]: formatted })
+      return
+    }
     setFormData({ ...formData, [name]: value })
   }
 
@@ -63,11 +77,12 @@ export default function CadastrarFazenda({ setAppLoading }) {
         phone: formData.telefone,
       })
 
-      const { telefone, ...safeFarmData } = formData
+      const { telefone, documento_proprietario, ...safeFarmData } = formData
       await addDoc(collection(db, "farms"), {
         ...safeFarmData,
         area_total: parseFloat(formData.area_total),
         telefone_mascarado: maskAccountPhone(telefone),
+        documento_proprietario_mascarado: maskAccountDocument(documento_proprietario),
         ownerId: user.uid,
         createdAt: new Date()
       })
@@ -124,6 +139,14 @@ export default function CadastrarFazenda({ setAppLoading }) {
               <option value="PJ">Pessoa Jurídica</option>
             </select>
           </div>
+
+          {formData.tipo_proprietario && (
+            <div className="input-group">
+              <label>{formData.tipo_proprietario === "PF" ? "CPF fictício" : "CNPJ fictício"}</label>
+              <input type="text" inputMode="numeric" name="documento_proprietario" value={formData.documento_proprietario} onChange={handleChange} placeholder={formData.tipo_proprietario === "PF" ? "000.000.000-00" : "00.000.000/0000-00"} maxLength={formData.tipo_proprietario === "PF" ? 14 : 18} required />
+              <small>Digite somente números; a pontuação é automática. Não use documento real. Exemplo: {formData.tipo_proprietario === "PF" ? "123.456.789-00" : "12.345.678/0001-00"}.</small>
+            </div>
+          )}
 
           <div className="input-group">
             <label>Data de Aquisição</label>

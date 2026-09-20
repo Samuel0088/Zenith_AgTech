@@ -18,6 +18,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const MOBILE_AUTH_HOSTS = new Set([
   "instalacao-mobile.vercel.app",
   "zenith-moblie.vercel.app",
+  "zenith-ag-tech.vercel.app",
 ])
 
 const SOCIAL_PROVIDER_IDS = {

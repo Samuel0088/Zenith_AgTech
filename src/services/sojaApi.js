@@ -94,3 +94,4 @@ export function diagnosticarSoja(file, options = {}) {
 }
 
 export { API_BASE_URL }
+import { auth } from "./firebase"

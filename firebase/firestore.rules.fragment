@@ -1,0 +1,29 @@
+// Add inside the existing Firestore rules service block. This is the same
+// featureUsage protection used by Zenith Desktop.
+function validUsageCounts(data) {
+  return data.get("diagnosisUses", 0) is int
+    && data.get("monitoringUses", 0) is int
+    && data.get("reconstruction3dUses", 0) is int
+    && data.get("diagnosisUses", 0) >= 0 && data.get("diagnosisUses", 0) <= 3
+    && data.get("monitoringUses", 0) >= 0 && data.get("monitoringUses", 0) <= 3
+    && data.get("reconstruction3dUses", 0) >= 0 && data.get("reconstruction3dUses", 0) <= 3;
+}
+
+match /featureUsage/{userId} {
+  allow read: if request.auth != null && request.auth.uid == userId;
+  allow create: if request.auth != null && request.auth.uid == userId
+    && request.resource.data.keys().hasOnly(["diagnosisUses", "monitoringUses", "reconstruction3dUses", "updatedAt"])
+    && validUsageCounts(request.resource.data)
+    && request.resource.data.get("diagnosisUses", 0) + request.resource.data.get("monitoringUses", 0) + request.resource.data.get("reconstruction3dUses", 0) == 1
+    && request.resource.data.updatedAt == request.time;
+  allow update: if request.auth != null && request.auth.uid == userId
+    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["diagnosisUses", "monitoringUses", "reconstruction3dUses", "updatedAt"])
+    && validUsageCounts(request.resource.data)
+    && request.resource.data.get("diagnosisUses", 0) >= resource.data.get("diagnosisUses", 0)
+    && request.resource.data.get("monitoringUses", 0) >= resource.data.get("monitoringUses", 0)
+    && request.resource.data.get("reconstruction3dUses", 0) >= resource.data.get("reconstruction3dUses", 0)
+    && request.resource.data.get("diagnosisUses", 0) + request.resource.data.get("monitoringUses", 0) + request.resource.data.get("reconstruction3dUses", 0)
+      == resource.data.get("diagnosisUses", 0) + resource.data.get("monitoringUses", 0) + resource.data.get("reconstruction3dUses", 0) + 1
+    && request.resource.data.updatedAt == request.time;
+  allow delete: if false;
+}

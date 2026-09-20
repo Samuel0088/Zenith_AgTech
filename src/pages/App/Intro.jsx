@@ -6,10 +6,8 @@ import {
   ArrowRight,
   Download,
   Globe2,
-  Leaf,
   LogIn,
   Radar,
-  ScanSearch,
   ShieldCheck,
   Smartphone,
 } from "lucide-react"
@@ -19,14 +17,7 @@ import LoadingScreen from "../../components/App/Home/LoadingScreen"
 import "../../styles/App/Intro.css"
 
 const Logo = "/assets/image/Logo-redonda.png"
-const SoyCutout = "/assets/image/soja-hero-cutout.png"
 export const SITE_CHOICE_SESSION_KEY = "zenithContinueOnWebsite"
-
-const highlights = [
-  { icon: ShieldCheck, label: "Diagnóstico confiável" },
-  { icon: Activity, label: "Acompanhamento contínuo" },
-  { icon: Radar, label: "Decisões em tempo real" },
-]
 
 export default function Intro({ onInstallRequest, isInstalled = false }) {
   const navigate = useNavigate()
@@ -126,98 +117,44 @@ export default function Intro({ onInstallRequest, isInstalled = false }) {
   }
 
   return (
-    <main className="intro" data-system-bar-color="#f4f8ef">
-      <div className="intro-shell">
-        <header className="intro-brand" aria-label="Zenith">
-          <div className="intro-brand__mark">
+    <main className="intro-page" data-system-bar-color="#091c13">
+      <section className="intro-hero" aria-labelledby="intro-title">
+        <div className="intro-hero__overlay" aria-hidden="true" />
+        <div className="intro-hero__content">
+          <div className="intro-logo" aria-label="Zenith">
             <img src={Logo} alt="" draggable="false" />
           </div>
-          <div className="intro-brand__copy">
-            <strong>Zenith</strong>
-            <span>Agricultura de precisão</span>
-          </div>
-          <span className="intro-brand__icon" aria-hidden="true">
-            <Leaf size={19} strokeWidth={2} />
-          </span>
-        </header>
+          <p className="intro-hero__subtitle">Agricultura de precisão</p>
+          <h1 id="intro-title">Bem-vindo à Zenith</h1>
+        </div>
+      </section>
 
-        <section className="intro-layout">
-          <div className="intro-visual" aria-label="Lavoura monitorada pela plataforma Zenith">
-            <div className="intro-visual__shade" aria-hidden="true" />
-            <div className="intro-visual__grid" aria-hidden="true" />
+      <section className="intro-card" aria-label="Comece a usar a Zenith">
+        <div className="intro-card__eyebrow">
+          <Radar size={17} strokeWidth={2.2} aria-hidden="true" />
+          Tecnologia para quem produz
+        </div>
+        <h2>Seu campo, visto com mais precisão.</h2>
+        <p>
+          Monitore lavouras, organize a operação e transforme dados em decisões mais seguras para a sua produção.
+        </p>
 
-            <div className="intro-visual__tag">
-              <ScanSearch size={16} strokeWidth={2.1} />
-              <span>Inteligência aplicada ao campo</span>
-            </div>
+        <div className="intro-benefits" aria-label="Benefícios da plataforma">
+          <span><ShieldCheck size={17} aria-hidden="true" />Diagnóstico confiável</span>
+          <span><Activity size={17} aria-hidden="true" />Acompanhamento contínuo</span>
+        </div>
 
-            <img
-              className="intro-visual__soy"
-              src={SoyCutout}
-              alt="Vagem de soja"
-              draggable="false"
-            />
-
-            <div className="intro-visual__caption">
-              <span className="intro-visual__signal" aria-hidden="true" />
-              <div>
-                <strong>Monitoramento ativo</strong>
-                <small>Dados do campo em uma única visão</small>
-              </div>
-            </div>
-          </div>
-
-          <div className="intro-content">
-            <div className="intro-eyebrow">
-              <Radar size={16} strokeWidth={2.2} />
-              <span>Tecnologia para quem produz</span>
-            </div>
-
-            <h1>
-              Seu campo, visto com <em>mais precisão.</em>
-            </h1>
-
-            <p className="intro-description">
-              Monitore lavouras, organize a operação e transforme imagens e dados em decisões mais seguras para a sua produção.
-            </p>
-
-            <div className="intro-highlights" aria-label="Benefícios da plataforma">
-              {highlights.map(({ icon: Icon, label }) => (
-                <div className="intro-highlight" key={label}>
-                  <span aria-hidden="true">
-                    <Icon size={18} strokeWidth={2} />
-                  </span>
-                  <small>{label}</small>
-                </div>
-              ))}
-            </div>
-
-            <div className="intro-actions">
-              <button
-                type="button"
-                className="intro-button intro-button--primary"
-                onClick={() => navigate("/register")}
-              >
-                <span>Começar agora</span>
-                <ArrowRight size={19} strokeWidth={2.2} />
-              </button>
-
-              <button
-                type="button"
-                className="intro-button intro-button--secondary"
-                onClick={() => navigate("/login")}
-              >
-                <LogIn size={18} strokeWidth={2.1} />
-                <span>Já tenho uma conta</span>
-              </button>
-            </div>
-
-            <p className="intro-footnote">
-              Gestão agrícola, diagnóstico e monitoramento em uma experiência simples.
-            </p>
-          </div>
-        </section>
-      </div>
+        <div className="intro-actions">
+          <button type="button" className="intro-button intro-button--primary" onClick={() => navigate("/register")}>
+            <span>Começar agora</span>
+            <ArrowRight size={19} strokeWidth={2.2} aria-hidden="true" />
+          </button>
+          <button type="button" className="intro-button intro-button--secondary" onClick={() => navigate("/login")}>
+            <LogIn size={18} strokeWidth={2.1} aria-hidden="true" />
+            <span>Já tenho uma conta</span>
+          </button>
+        </div>
+      </section>
     </main>
   )
 }

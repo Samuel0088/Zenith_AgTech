@@ -17,7 +17,7 @@
 /* =========================
    DESIGN TOKENS — DARK THEME
 ========================= */
-:root {
+.login-page {
   /* ─── Cores base ─── */
   --color-forest-deep:      #091c13;
   --color-forest-dark:      #0d2b1f;
@@ -120,7 +120,7 @@
 
 /* ─── Light theme override ─── */
 @media (prefers-color-scheme: light) {
-  :root {
+  .login-page {
     --surface-page:           #ddeedd;
     --surface-card:           rgba(255, 255, 255, 0.99);
     --surface-input:          rgba(225, 242, 228, 0.65);
@@ -138,28 +138,28 @@
 /* =========================
    RESET / BASE
 ========================= */
-*, *::before, *::after {
+.login-page, .login-page *, .login-page *::before, .login-page *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-body {
+.login-page {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: var(--surface-page);
 }
 
-button {
+.login-page button {
   cursor: pointer;
   border: none;
   background: none;
   font-family: inherit;
 }
 
-a { text-decoration: none; }
-input { font-family: inherit; }
+.login-page a { text-decoration: none; }
+.login-page input { font-family: inherit; }
 
 
 /* =========================
@@ -190,7 +190,7 @@ input { font-family: inherit; }
   max-height: 360px;
   /* Imagem local com fallback Unsplash (campo/fazenda) */
   background-image:
-    url("assets/image/img-fundoLogineCadastro.jpg"),
+    url("/assets/image/img-fundoLogineCadastro.jpg"),
     url("https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=900&q=80");
   background-size: cover;
   background-position: center 40%;
@@ -270,7 +270,7 @@ input { font-family: inherit; }
   display: inline-block;
 }
 
-.logo-img {
+.login-logo .logo-img {
   width: 68px;
   height: 68px;
   border-radius: 50%;
@@ -854,44 +854,29 @@ input { font-family: inherit; }
   .login-page::before,
   .login-page::after { display: none; }
 
-  /* Coluna esquerda: imagem hero com efeito premium */
-  .login-hero-desktop {
-    display: block;
+  /* Coluna esquerda: o hero do próprio componente permanece visível. */
+  .login-hero {
+    display: flex;
     grid-column: 1;
     position: relative;
+    width: auto;
+    height: auto;
+    min-height: 100dvh;
+    max-height: none;
+    margin-left: 0;
     overflow: hidden;
+    background-position: center 40%;
   }
 
-  .login-hero-desktop::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: url('https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?w=1600&q=85');
-    background-size: cover;
-    background-position: center 30%;
-    z-index: 0;
-    transition: transform 20s ease-in-out;
-  }
-
-  /* Overlay cinematográfico no desktop */
-  .login-hero-desktop::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(
-        135deg,
-        rgba(6, 20, 10, 0.55) 0%,
-        rgba(9, 30, 18, 0.35) 60%,
-        rgba(22, 60, 35, 0.45) 100%
-      );
-    z-index: 1;
+  .login-hero__content {
+    padding: 0 clamp(42px, 7vw, 96px) clamp(46px, 8vh, 92px);
   }
 
   .login-card {
     grid-column: 2;
     border-radius: 0;
     max-width: none;
+    align-items: center;
     justify-content: center;
     padding: 0 64px;
     background: var(--surface-card);
@@ -901,9 +886,8 @@ input { font-family: inherit; }
     box-shadow: -20px 0 60px rgba(0, 0, 0, 0.20);
     min-height: 100dvh;
   }
-}
 
-/* Desktop: esconder .login-hero mobile */
-@media (min-width: 1024px) {
-  .login-hero { display: none; }
+  .login-card > * {
+    width: min(100%, 430px);
+  }
 }

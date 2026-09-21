@@ -43,9 +43,10 @@ async function geocodeAddress(query) {
   const params = new URLSearchParams({
     q: query,
     format: "jsonv2",
-    limit: "1",
+    limit: "3",
     countrycodes: "br",
     "accept-language": "pt-BR",
+    addressdetails: "1",
   })
   const results = await fetchJson(`${NOMINATIM_SEARCH_URL}?${params.toString()}`)
   const result = Array.isArray(results) ? results[0] : null
@@ -59,19 +60,54 @@ async function geocodeAddress(query) {
   )
 }
 
+function locationMatchesCep(result, cep) {
+  const expectedCep = normalizeCep(cep)
+  const resultCep = normalizeCep(result?.address?.postcode)
+  const labelCep = normalizeCep(result?.display_name)
+
+  return resultCep === expectedCep || labelCep.includes(expectedCep)
+}
+
+async function geocodeCepAddress(queries, cep) {
+  for (const query of queries) {
+    const params = new URLSearchParams({
+      q: query,
+      format: "jsonv2",
+      limit: "3",
+      countrycodes: "br",
+      "accept-language": "pt-BR",
+      addressdetails: "1",
+    })
+    const results = await fetchJson(`${NOMINATIM_SEARCH_URL}?${params.toString()}`)
+
+    if (!Array.isArray(results) || results.length === 0) continue
+
+    const exactCepResult = results.find((result) => locationMatchesCep(result, cep))
+    if (exactCepResult) {
+      return parseLocation(
+        exactCepResult.lat,
+        exactCepResult.lon,
+        exactCepResult.display_name?.split(",").slice(0, 4).join(",") || query,
+      )
+    }
+  }
+
+  return null
+}
+
 async function resolveCepLocation(cep) {
+  let brasilApiLocation = null
+
   try {
     const data = await fetchJson(`https://brasilapi.com.br/api/cep/v2/${cep}`)
     const addressLabel = [data.street, data.neighborhood, data.city, data.state]
       .filter(Boolean)
       .join(", ")
-    const location = parseLocation(
+    brasilApiLocation = parseLocation(
       data.location?.coordinates?.latitude,
       data.location?.coordinates?.longitude,
       addressLabel,
     )
-
-    if (location) return location
   } catch (error) {
     console.warn("BrasilAPI não conseguiu localizar o CEP; tentando fallback.", error)
   }
@@ -82,12 +118,38 @@ async function resolveCepLocation(cep) {
   const addressLabel = [data.logradouro, data.bairro, data.localidade, data.uf]
     .filter(Boolean)
     .join(", ")
-  const geocodingQuery = [data.logradouro, data.localidade, data.uf, "Brasil"]
-    .filter(Boolean)
-    .join(", ")
-  const location = await geocodeAddress(geocodingQuery)
+  const cityState = [data.localidade, data.uf].filter(Boolean).join(", ")
+  const isSpecificAddress = Boolean(data.logradouro || data.bairro)
 
-  if (!location) throw new Error("Não foi possível localizar esse CEP no mapa")
+  try {
+    const awesomeData = await fetchJson(`https://cep.awesomeapi.com.br/json/${cep}`)
+    const awesomeLocation = parseLocation(awesomeData.lat, awesomeData.lng, [
+      awesomeData.address,
+      awesomeData.district,
+      awesomeData.city,
+      awesomeData.state,
+    ].filter(Boolean).join(", "))
+
+    if (awesomeLocation) return awesomeLocation
+  } catch (error) {
+    console.warn("AwesomeAPI não conseguiu localizar o CEP; tentando geocodificação.", error)
+  }
+
+  const queries = [
+    [data.logradouro, data.bairro, data.localidade, data.uf, "Brasil"].filter(Boolean).join(", "),
+    [`${cep.slice(0, 5)}-${cep.slice(5)}`, cityState, "Brasil"].filter(Boolean).join(", "),
+    `${cep}, Brasil`,
+  ].filter((query, index, list) => query && list.indexOf(query) === index)
+  const location = await geocodeCepAddress(queries, cep)
+
+  if (!location) {
+    if (!isSpecificAddress && brasilApiLocation) return brasilApiLocation
+
+    const detail = isSpecificAddress
+      ? "O CEP foi encontrado, mas não há coordenada exata disponível para esse endereço."
+      : "Não foi possível localizar esse CEP no mapa"
+    throw new Error(detail)
+  }
 
   return { ...location, addressLabel: addressLabel || location.addressLabel }
 }

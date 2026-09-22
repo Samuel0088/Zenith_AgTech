@@ -883,7 +883,7 @@ function WebODMPanel({
     const permission = await threeDAccess.consume()
     if (!permission.allowed) {
       window.alert(permission.limitReached
-        ? "Você já utilizou as três reconstruções 3D disponíveis."
+        ? "Você já utilizou as três reconstruções 3D disponíveis hoje. Tente novamente amanhã."
         : permission.error?.message || "Não foi possível verificar o limite de reconstruções 3D.")
       return
     }

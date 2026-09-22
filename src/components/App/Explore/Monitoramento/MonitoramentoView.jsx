@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useMonitoramento } from "../hooks/useMonitoramento";
 import UploadImage   from "./UploadImage";
+import FeatureAccessPanel from "../FeatureAccessPanel";
+import { useFeatureAccess } from "../../../../hooks/useFeatureAccess";
 import OverlayResult from "./OverlayResult";
 import MetricsPanel  from "./MetricsPanel";
 import { downloadMonitoringHistoryReport } from "./monitoringReportPdf";
 import { interpretar } from "../../utils/Interpretations";
-import { useFeatureAccess } from "../../../../hooks/useFeatureAccess";
 import styles from "../../../../styles/App/MonitoramentoView.module.css";
 
 const PLANTING_HISTORY_KEY = "plantingAnalysisHistory";
@@ -41,8 +42,8 @@ function toPercentage(value) {
  *  [Botão: Nova análise]
  */
 export default function MonitoramentoView() {
-  const featureAccess = useFeatureAccess("monitoring");
-  const { analisar, resetar, result, loading, error, preview } = useMonitoramento(featureAccess.consume);
+  const { analisar, resetar, result, loading, error, preview } = useMonitoramento();
+  const monitoringAccess = useFeatureAccess("monitoring");
   const [history, setHistory] = useState(readPlantingHistory);
   const [showAllHistory, setShowAllHistory] = useState(false);
   const savedResultRef = useRef(null);
@@ -126,6 +127,11 @@ export default function MonitoramentoView() {
 
   const visibleHistory = showAllHistory ? history : history.slice(0, 5);
 
+  const handleAnalyze = async (file) => {
+    const permission = await monitoringAccess.consume();
+    if (permission.allowed) await analisar(file);
+  };
+
   const exportHistory = async () => {
     const validAlignments = history
       .map((item) => Number(item.alignment))
@@ -171,13 +177,6 @@ export default function MonitoramentoView() {
           <p className={styles.subtitulo}>
             Analise o alinhamento e a uniformidade das fileiras
           </p>
-          <p className={styles.usageLimit} aria-live="polite">
-            {featureAccess.loading
-              ? "Verificando o limite de análises..."
-              : featureAccess.fullAccess
-                ? "Acesso ilimitado para demonstração."
-                : `Limite de demonstração: você utilizou ${featureAccess.used} de 3 análises. Restam ${featureAccess.remaining}.`}
-          </p>
         </div>
 
         <section
@@ -216,13 +215,15 @@ export default function MonitoramentoView() {
         </section>
       </section>
 
+      <FeatureAccessPanel feature="monitoring" access={monitoringAccess} />
+
       {/* ------------------------------------------------------------------ */}
       {/* Upload — sempre visível                                             */}
       {/* ------------------------------------------------------------------ */}
-      {!mostrarResultados && (
+      {!mostrarResultados && (monitoringAccess.fullAccess || monitoringAccess.remaining > 0) && !monitoringAccess.loading && !monitoringAccess.error && (
         <UploadImage
-          onSelect={analisar}
-          disabled={loading}
+          onSelect={handleAnalyze}
+          disabled={loading || monitoringAccess.loading}
         />
       )}
 

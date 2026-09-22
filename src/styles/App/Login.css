@@ -151,7 +151,7 @@
   background: var(--surface-page);
 }
 
-.login-page button {
+:where(.login-page) button {
   cursor: pointer;
   border: none;
   background: none;

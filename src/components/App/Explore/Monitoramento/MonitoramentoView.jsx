@@ -1,8 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useMonitoramento } from "../hooks/useMonitoramento";
 import UploadImage   from "./UploadImage";
-import FeatureAccessPanel from "../FeatureAccessPanel";
-import { useFeatureAccess } from "../../../../hooks/useFeatureAccess";
 import OverlayResult from "./OverlayResult";
 import MetricsPanel  from "./MetricsPanel";
 import { downloadMonitoringHistoryReport } from "./monitoringReportPdf";
@@ -43,7 +41,6 @@ function toPercentage(value) {
  */
 export default function MonitoramentoView() {
   const { analisar, resetar, result, loading, error, preview } = useMonitoramento();
-  const monitoringAccess = useFeatureAccess("monitoring");
   const [history, setHistory] = useState(readPlantingHistory);
   const [showAllHistory, setShowAllHistory] = useState(false);
   const savedResultRef = useRef(null);
@@ -126,11 +123,6 @@ export default function MonitoramentoView() {
   };
 
   const visibleHistory = showAllHistory ? history : history.slice(0, 5);
-
-  const handleAnalyze = async (file) => {
-    const permission = await monitoringAccess.consume();
-    if (permission.allowed) await analisar(file);
-  };
 
   const exportHistory = async () => {
     const validAlignments = history
@@ -215,15 +207,13 @@ export default function MonitoramentoView() {
         </section>
       </section>
 
-      <FeatureAccessPanel feature="monitoring" access={monitoringAccess} />
-
       {/* ------------------------------------------------------------------ */}
       {/* Upload — sempre visível                                             */}
       {/* ------------------------------------------------------------------ */}
-      {!mostrarResultados && (monitoringAccess.fullAccess || monitoringAccess.remaining > 0) && !monitoringAccess.loading && !monitoringAccess.error && (
+      {!mostrarResultados && (
         <UploadImage
-          onSelect={handleAnalyze}
-          disabled={loading || monitoringAccess.loading}
+          onSelect={analisar}
+          disabled={loading}
         />
       )}
 

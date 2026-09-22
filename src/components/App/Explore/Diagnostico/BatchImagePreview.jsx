@@ -1,5 +1,4 @@
 import { useEffect, useMemo } from "react"
-import FeatureAccessPanel from "../FeatureAccessPanel"
 import "../../../../styles/App/BatchDiagnosis.css"
 
 function formatBytes(bytes) {
@@ -14,8 +13,6 @@ export default function BatchImagePreview({
   onRemoveImage,
   onBack,
   onAnalyze,
-  analyzeDisabled = false,
-  featureAccess,
   addImagesLabel = "Adicionar fotos",
   addImagesIcon = "add_photo_alternate",
   addTileTitle = "Adicionar",
@@ -68,8 +65,6 @@ export default function BatchImagePreview({
             </div>
           </div>
         </header>
-
-        <FeatureAccessPanel feature="diagnosis" access={featureAccess} />
 
         {notice?.text && (
           <div className={`batch-notice batch-notice-${notice.type || "info"}`} role="status">
@@ -137,7 +132,7 @@ export default function BatchImagePreview({
               type="button"
               className="batch-button batch-button-primary"
               onClick={onAnalyze}
-              disabled={images.length === 0 || analyzeDisabled}
+              disabled={images.length === 0}
             >
               <span className="material-symbols-outlined">auto_awesome</span>
               Analisar {images.length === 1 ? "foto" : `${images.length} fotos`}

@@ -2720,10 +2720,3 @@
     align-self: center;
   }
 }
-
-.analysis-usage {
-  margin-top: 10px;
-  color: rgba(232, 248, 232, .86);
-  font-size: .8rem;
-  font-weight: 700;
-}

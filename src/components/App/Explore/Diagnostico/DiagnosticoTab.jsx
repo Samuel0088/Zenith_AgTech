@@ -6,9 +6,7 @@ import BatchDiagnosisResult from "./BatchDiagnosisResult"
 import AnalysisLoader from "./AnalysisLoader"
 import DiagnosisResult from "./DiagnosisResult"
 import AllHistory from "./AllHistory"
-import FeatureAccessPanel from "../FeatureAccessPanel"
 import { formatDiagnosisName } from "./diagnosisLabels"
-import { useFeatureAccess } from "../../../../hooks/useFeatureAccess"
 import { diagnosticarLote } from "../../../../services/sojaApi"
 import { useLanguage } from "../../../../contexts/LanguageContext"
 import "../../../../styles/App/Diagnostico.css"
@@ -150,7 +148,6 @@ export default function DiagnosticoTab() {
   const selectedImagesRef = useRef([])
   const requestControllerRef = useRef(null)
   const location = useLocation()
-  const diagnosisAccess = useFeatureAccess("diagnosis")
 
   const [step, setStep] = useState("start")
   const [selectedImages, setSelectedImages] = useState([])
@@ -421,12 +418,6 @@ export default function DiagnosticoTab() {
 
   const analyzeBatch = async () => {
     if (selectedImages.length === 0) return
-    const permission = await diagnosisAccess.consume()
-    if (!permission.allowed) {
-      if (permission.limitReached) setSelectionNotice({ type: "warning", text: "Você já usou as 3 análises de hoje. Novas análises ficam disponíveis amanhã." })
-      else if (!permission.pending) setSelectionNotice({ type: "warning", text: "Não foi possível verificar o acesso à análise. Tente novamente." })
-      return
-    }
 
     const controller = new AbortController()
     requestControllerRef.current = controller
@@ -504,8 +495,6 @@ export default function DiagnosticoTab() {
           onRemoveImage={removeSelectedImage}
           onBack={reset}
           onAnalyze={analyzeBatch}
-          analyzeDisabled={diagnosisAccess.loading || Boolean(diagnosisAccess.error) || (!diagnosisAccess.fullAccess && diagnosisAccess.remaining === 0)}
-          featureAccess={diagnosisAccess}
           addImagesLabel={selectionSource === "camera" ? t("diagnosis.takeAnother") : t("diagnosis.addPhotos")}
           addImagesIcon={selectionSource === "camera" ? "photo_camera" : "add_photo_alternate"}
           addTileTitle={selectionSource === "camera" ? t("diagnosis.takePhotoShort") : t("diagnosis.add")}
@@ -606,8 +595,6 @@ export default function DiagnosticoTab() {
         </section>
       </div>
 
-      <FeatureAccessPanel feature="diagnosis" access={diagnosisAccess} />
-
       {selectionNotice?.text && (
         <div className="tips-card" role="status">
           <div className="tips-header">
@@ -618,7 +605,7 @@ export default function DiagnosticoTab() {
         </div>
       )}
 
-      {(diagnosisAccess.fullAccess || diagnosisAccess.remaining > 0) && !diagnosisAccess.loading && !diagnosisAccess.error && <div className="options-grid">
+      <div className="options-grid">
         {isMobile && (
           <button type="button" className="option-card" onClick={startCamera}>
             <div className="card-glow"></div>
@@ -660,7 +647,7 @@ export default function DiagnosticoTab() {
             <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
           </div>
         </button>
-      </div>}
+      </div>
 
       <div className="history-section">
         <div className="section-header">
@@ -684,7 +671,7 @@ export default function DiagnosticoTab() {
               <p className="empty-description">
                 {t("diagnosis.firstDiagnosis")}
               </p>
-              {(diagnosisAccess.fullAccess || diagnosisAccess.remaining > 0) && !diagnosisAccess.loading && !diagnosisAccess.error && <div className="empty-actions">
+              <div className="empty-actions">
                 {isMobile && (
                   <button type="button" className="empty-action" onClick={startCamera}>
                     <span className="material-symbols-outlined">photo_camera</span>
@@ -695,7 +682,7 @@ export default function DiagnosticoTab() {
                   <span className="material-symbols-outlined">photo_library</span>
                   {t("diagnosis.gallery")}
                 </button>
-              </div>}
+              </div>
             </div>
           ) : (
             history.slice(0, 5).map((item) => (

@@ -4,7 +4,6 @@ import { useFarm } from "./hooks/useFarm"
 import { formatDiagnosisName } from "./Diagnostico/diagnosisLabels"
 import { auth, db } from "../../../services/firebase"
 import { ACCOUNT_ROLES } from "../../../services/accessControl"
-import { useFeatureAccess } from "../../../hooks/useFeatureAccess"
 import "../../../styles/App/MapaTab.css"
 
 import L from "leaflet"
@@ -878,17 +877,7 @@ function WebODMPanel({
   onFocusRoute,
   onExportReport,
 }) {
-  const threeDAccess = useFeatureAccess("reconstruction3d")
-  const open3D = async () => {
-    const permission = await threeDAccess.consume()
-    if (!permission.allowed) {
-      window.alert(permission.limitReached
-        ? "Você já utilizou as três reconstruções 3D disponíveis hoje. Tente novamente amanhã."
-        : permission.error?.message || "Não foi possível verificar o limite de reconstruções 3D.")
-      return
-    }
-    window.open(analysis.publicTaskUrl, "_blank", "noopener,noreferrer")
-  }
+  const open3D = () => window.open(analysis.publicTaskUrl, "_blank", "noopener,noreferrer")
   const hasDetections = analysis?.detections?.length > 0
 
   if (!analysis) {
@@ -1062,9 +1051,6 @@ function WebODMPanel({
                 <span className="material-symbols-outlined">view_in_ar</span>
                 Abrir 3D
               </button>
-            )}
-            {!threeDAccess.loading && (
-              <small className="webodm-muted">{threeDAccess.fullAccess ? "Reconstrução 3D: acesso ilimitado" : `Reconstruções 3D: ${threeDAccess.used} de 3 usadas`}</small>
             )}
             <button type="button" onClick={onFocusRoute}>
               <span className="material-symbols-outlined">route</span>
